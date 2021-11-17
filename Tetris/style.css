@@ -1,0 +1,43 @@
+* {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* display it centered over the canvas */
+#main-menu {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#menu-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#menu-buttons button {
+    margin: 10px;
+    padding: 10px;
+    border: none;
+    background-color: #f0f0f0;
+    font-size: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    color: #000;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#menu-buttons button:hover {
+    background-color: #e0e0e0;
+}
