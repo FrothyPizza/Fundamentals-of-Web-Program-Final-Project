@@ -74,6 +74,7 @@ class PlayerTetrisGame {
         }
 
         this.curMino = new Tetromino(this.nextList[0]);
+        this.nextList.splice(0, 1);
 
 
         this.Lclock = new Clock();
@@ -94,7 +95,7 @@ class PlayerTetrisGame {
         this.SDFClock.start();
 
         this.das = 90;
-        this.sdf = 5;
+        this.sdf = 0;
         this.arr = 0;
 
 
@@ -105,6 +106,7 @@ class PlayerTetrisGame {
     inputLeft(leftPressed, rightPressed) {
         if (rightPressed && this.RARRClock.getElapsedTime() > 0 && leftPressed) {
             this.Rclock.restart();
+            
         }
 
         if (leftPressed && this.LclockRestarted == false) {
@@ -135,6 +137,7 @@ class PlayerTetrisGame {
     inputRight(leftPressed, rightPressed) {
         if (leftPressed && this.LARRClock.getElapsedTime() > 0 && rightPressed) {
             this.Lclock.restart();
+            
         }
 
         if (rightPressed && this.RclockRestarted == false) {
@@ -186,13 +189,14 @@ class PlayerTetrisGame {
             this.gameState.hardDrop(this.curMino);
             this.curMino.setTetromino(this.nextList[0]);
             this.nextList.splice(0, 1);
-            if (this.nextList.length < 14) this.pushOntoNextlist();
+            if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
             //piecesPlaced++;
 
             let clear = this.gameState.lastClear;
             if (clear <= 0) this.gameState.placeGarbage();
 
             let attack = this.gameState.lastAttack;
+
 
 
 

@@ -1,6 +1,6 @@
 
 
-var keys = [];
+let keys = [];
 
 document.addEventListener('keydown', event => {
     keys[event.keyCode] = true;
@@ -24,14 +24,14 @@ String.prototype.replaceAt = function(index, replacement) {
 }
 
 
-var canvas = document.getElementById('canvas');
+let canvas = document.getElementById('canvas');
 
 canvas.width = 600;
 canvas.height = 600;
-var fullScreen = true;
-var context = canvas.getContext('2d');
+let fullScreen = true;
+let context = canvas.getContext('2d');
 
-var view = {
+let view = {
     x: 0,
     y: 0
 };
@@ -41,7 +41,6 @@ function fill(r, g, b){
 }
 
 function rect(x, y, w, h){
-    // use this commented line intead of the one below to prevent some block blurring when rendering, but it makes it feel more... clunky, I guess
     //context.fillRect(Math.round(x - view.x), Math.round(y - view.y), w, h);   
     context.fillRect(x - view.x, y - view.y, w, h);   
 }
@@ -51,7 +50,7 @@ const COLLISION_MARGIN = 7;
 
 
 
-var BLOCKS = {
+let BLOCKS = {
     ground: 'B',
     invisibleGround: 'I',
     red: 'R',
@@ -66,12 +65,12 @@ var BLOCKS = {
     notThere: 'N', // a false block
     win: 'W'
 }
-var flashingBlockTimer = 0;
-var FRAMES_PER_FLASH = 60;
+let flashingBlockTimer = 0;
+let FRAMES_PER_FLASH = 60;
 
 // map converter is here 
 // https://replit.com/@HaroldSeamans/Hals-Tower-Map-Format-Converter#Main.java
-var map =  [
+let map =  [
             "BBBB.................",
             "B..B.................",
             "B..B.................",
@@ -354,7 +353,7 @@ const playerConstants = {
     horizontalBounce: 12
 };
 
-var player = {
+let player = {
     x: 0,
     y: 0,
     xVel: 0,
@@ -451,8 +450,8 @@ function collidingWithBlock(blockX, blockY, collisionProtrusion=0) {
            
 // function renderMapAndHandleCollisions(){
 //     ++flashingBlockTimer;
-//     for(var y = 0; y < map.length; ++y) {
-//         for(var x = 0; x < map[y].length; ++x) {
+//     for(let y = 0; y < map.length; ++y) {
+//         for(let x = 0; x < map[y].length; ++x) {
             
 //             if(flashingBlockTimer % FRAMES_PER_FLASH == 0) {
                 
@@ -582,7 +581,7 @@ function collidingWithBlock(blockX, blockY, collisionProtrusion=0) {
 //             if(map[y][x] == BLOCKS.ground || map[y][x] == BLOCKS.invisibleGround || map[y][x] == BLOCKS.flashing || map[y][x] == BLOCKS.disappearing) {
 //                 if(collidingWithTopOfBlock(blockX, blockY, 0, 2)) {
 //                     // if moving up, then don't allow for a jump
-//                     var shouldntJump = false;
+//                     let shouldntJump = false;
 //                     if(player.yVel < 0) shouldntJump = true;
                     
 //                     player.yVel = 0;
@@ -620,8 +619,8 @@ function collidingWithBlock(blockX, blockY, collisionProtrusion=0) {
 //     }
 // }
 function renderMap() {
-    for(var y = 0; y < map.length; ++y) {
-        for(var x = 0; x < map[y].length; ++x) {
+    for(let y = 0; y < map.length; ++y) {
+        for(let x = 0; x < map[y].length; ++x) {
             
             if(flashingBlockTimer % FRAMES_PER_FLASH == 0) {
                 
@@ -694,8 +693,8 @@ function renderMap() {
 function handleCollisions() {
     ++flashingBlockTimer;
 
-    for(var y = 0; y < map.length; ++y) {
-        for(var x = 0; x < map[y].length; ++x) {
+    for(let y = 0; y < map.length; ++y) {
+        for(let x = 0; x < map[y].length; ++x) {
             let blockX = x * BLOCK_SIZE;
             let blockY = y * BLOCK_SIZE;
             
@@ -820,7 +819,7 @@ function constrain(a, b, c) {
     return a;
 }
 
-// Make the view smoothly follow the player
+// Make the view smoothly follow the player using a linear interpolation
 function updateView(){
 
     width = canvas.width;
@@ -835,23 +834,23 @@ function updateView(){
     // view.y = player.y - canvas.height/2 - playerConstants.height/2;
 }
 
-var savedTime = 0;
-var startDate = new Date();
-var startTime = startDate.getTime();
-var pauseTime = 0;
+let savedTime = 0;
+let startDate = new Date();
+let startTime = startDate.getTime();
+let pauseTime = 0;
 function secondsElapsed() {
-    var date_now = new Date ();
-    var time_now = date_now.getTime ();
-    var time_diff = time_now - startTime;
-    var seconds_elapsed = time_diff / 1000;
+    let date = new Date();
+    let time = date.getTime();
+    let difference = time - startTime;
+    let seconds = difference / 1000;
 	
-    player.savedTime = seconds_elapsed + savedTime;
+    player.savedTime = seconds + savedTime;
 
     if(paused) return pauseTime;
-    return seconds_elapsed + savedTime; 
+    return seconds + savedTime; 
 }
 
-var devtools = false;
+let devtools = false;
 
 if(localStorage.getItem('spawnX')) {
     player.spawnX = parseFloat(localStorage.getItem('spawnX'));
@@ -869,9 +868,9 @@ if(localStorage.getItem('spawnX')) {
 resetPlayer();
 
 
-var resumeButton = document.getElementById('resume');
-var restartButton = document.getElementById('restart');
-var creditsButton = document.getElementById('credits');
+let resumeButton = document.getElementById('resume');
+let restartButton = document.getElementById('restart');
+let creditsButton = document.getElementById('credits');
 
 restartButton.onclick = function() {
     if(confirm("Would you really like to restart? This will erase your progress.")) {
@@ -905,7 +904,7 @@ home.onclick = function() {
 // When the restart button is pressed, the game restarts
 // When the credits button is pressed, the game displays the credits
 // The credits are displayed in the pause menu
-var paused = false;
+let paused = false;
 function pause() {
     if(!paused) {
         savedTime = secondsElapsed();
