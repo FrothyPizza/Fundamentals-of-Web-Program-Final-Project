@@ -6,13 +6,66 @@
     </head>
     <body>
         <canvas id="canvas" width="800" height="800"></canvas>
-        <!-- <div id="main-menu">
-            <div id="menu-buttons">
-                <button id="start-button" onclick="startGame()">Start</button>
-                <button id="pause-button" onclick="pauseGame()">Pause</button>
-                <button id="restart-button" onclick="restartGame()">Restart</button>
+        <div id="pauseMenu">
+            <div id="pauseContents">
+                <h1>Game Paused</h1>
+                <button id="backButton" style="display: none;">Back</button>
+                <div id="mainPauseMenu">
+                    <button id="resumeButton">Resume</button>
+                    <button id="restartButton">Restart</button>
+                    <button id="homeButton">Home</button>
+                    <button id="settingsButton">Settings</button>
+                </div>
+                <div id="settingsContents">
+                    <div id="das">
+                        <h3>DAS:</h3>
+                        <input type="number" id="dasInput" value="0">
+                    </div>
+                    <div id="arr">
+                        <h3>ARR:</h3>
+                        <input type="number" id="arrInput" value="0">
+                    </div>
+                    <div id="sdf">
+                        <h3>SDF:</h3>
+                        <input type="number" id="sdfInput" value="0">
+                    </div>
+                    <h2>Controls</h2>
+                    <div id="controls">
+                        <div id="left">
+                            <h3>Left:</h3>
+                            <input type="text" id="leftInput" class="controlInput" onkeydown="return false">
+                        </div>
+                        <div id="right">
+                            <h3>Right:</h3>
+                            <input type="text" id="rightInput" class="controlInput" onkeydown="return false">
+                        </div>
+                        <div id="rotateCW">
+                            <h3>Rotate CW:</h3>
+                            <input type="text" id="rotateCWInput" class="controlInput" onkeydown="return false">
+                        </div>
+                        <div id="rotateCCW">
+                            <h3>Rotate CCW:</h3>
+                            <input type="text" id="rotateCCWInput" class="controlInput" onkeydown="return false">
+                        </div>
+                        <div id="rotate180">
+                            <h3>Rotate 180:</h3>
+                            <input type="text" id="rotate180Input" class="controlInput" onkeydown="return false">
+                        </div>
+                        <div id="softDrop">
+                            <h3>Soft Drop:</h3>
+                            <input type="text" id="softDropInput" class="controlInput" onkeydown="return false">
+                        </div>
+                        <div id="hardDrop">
+                            <h3>Hard Drop:</h3>
+                            <input type="text" id="hardDropInput" class="controlInput" onkeydown="return false">
+                        </div>
+                        <div id="hold">
+                            <h3>Hold:</h3>
+                            <input type="text" id="holdInput" class="controlInput" onkeydown="return false">
+                        </div>
+                </div> 
             </div>
-        </div> -->
+        </div>
         <script src="javascript/constants.js"></script>
         <script src="javascript/tetris-gamestate.js"></script>
         <script src="javascript/tetris-render.js"></script>

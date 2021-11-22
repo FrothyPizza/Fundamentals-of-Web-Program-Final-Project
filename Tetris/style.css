@@ -5,39 +5,112 @@
 }
 
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    font-family: sans-serif;
 }
 
-/* display it centered over the canvas */
-#main-menu {
+
+#canvas {
+    border: 1px solid black;   
+    
+}
+
+#pauseMenu {
+    display: block;
+    opacity: 1;
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 100;
+    visibility: hidden;
 }
 
-#menu-buttons {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+#pauseContents {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 101;
 }
 
-#menu-buttons button {
-    margin: 10px;
-    padding: 10px;
-    border: none;
-    background-color: #f0f0f0;
-    font-size: 20px;
-    font-family: 'Roboto', sans-serif;
-    font-weight: bold;
-    color: #000;
+#pauseContents h1 {
+    font-size: 2em;
+    color: white;
+    text-align: center;
+}
+
+/* Center the buttons below the h1 */
+#pauseContents button {
+    margin: 0 auto;
+    display: block;
+    width: 100%;
+    font-size: 1.5em;
+    padding: 1em;
+    border: 1px solid white;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
     cursor: pointer;
-    border-radius: 5px;
 }
 
-#menu-buttons button:hover {
-    background-color: #e0e0e0;
+#pauseContents button:hover {
+    background-color: rgba(0,0,0,0.8);
+    border-width: 2px;
+}
+
+#pauseContents #settingsContents {
+    font-size: 0.8em;
+    text-align: center;
+    margin-top: 1em;
+    color: white;
+
+
+}
+
+#pauseContents #settingsContents input {
+    margin-left: 0.5em;
+    padding: 0.5em;
+    margin-bottom: 0.5em;
+    width: 2em;
+    text-align: center;
+    border: 1px solid white;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    cursor: pointer;
+
+    display: inline-block;
+    width: 4em;
+    margin-left: 0.5em;
+}
+
+#pauseContents #settingsContents #controls input {
+    caret-color: transparent;
+}
+
+#pauseContents #settingsContents input:hover {
+    background-color: rgba(0,0,0,0.8);
+    border-width: 2px;
+}
+
+#pauseContents #settingsContents input:focus {
+    outline: none;
+}
+
+
+/* #pauseContents #settingsContents input:active {
+    background-color: rgba(0,0,0,0.8);
+    border-width: 2px;
+} */
+
+#pauseContents #settingsContents h3 {
+    display: inline-block;
+    width: 10em;
+    text-align: left;
+}
+
+
+#pauseContents #settingsContents input.selectedInput {
+    border-width: 2px;
+    background-color: rgba(0,255,0,0.8);
 }

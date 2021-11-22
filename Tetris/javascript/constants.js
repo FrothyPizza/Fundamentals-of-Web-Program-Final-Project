@@ -97,7 +97,7 @@ const TSPIN_MINI = 1;
 const TSPIN = 2;
 
 
-const CONTROLS = {
+let CONTROLS = {
     LEFT: 37,
     RIGHT: 39,
     HARD_DROP: 32,

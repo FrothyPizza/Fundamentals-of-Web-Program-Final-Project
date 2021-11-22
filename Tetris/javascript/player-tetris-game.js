@@ -103,10 +103,11 @@ class PlayerTetrisGame {
     }
 
 
+
     inputLeft(leftPressed, rightPressed) {
         if (rightPressed && this.RARRClock.getElapsedTime() > 0 && leftPressed) {
             this.Rclock.restart();
-            
+            this.RARRClock.restart();
         }
 
         if (leftPressed && this.LclockRestarted == false) {
@@ -120,6 +121,11 @@ class PlayerTetrisGame {
         }
         if (this.arr > 0) {
             if (this.Lclock.getElapsedTime() > this.das && leftPressed) {
+                if(rightPressed){
+                    this.gameState.moveX(this.curMino, -1);
+                    this.Lclock.restart();
+                }
+
                 if (this.LARRClock.getElapsedTime() > this.arr) {
                     this.LARRClock.restart();
                     this.gameState.moveX(this.curMino, -1);
@@ -137,7 +143,7 @@ class PlayerTetrisGame {
     inputRight(leftPressed, rightPressed) {
         if (leftPressed && this.LARRClock.getElapsedTime() > 0 && rightPressed) {
             this.Lclock.restart();
-            
+            this.LARRClock.restart();
         }
 
         if (rightPressed && this.RclockRestarted == false) {
@@ -151,6 +157,10 @@ class PlayerTetrisGame {
         }
         if (this.arr > 0) {
             if (this.Rclock.getElapsedTime() > this.das && rightPressed) {
+                if(leftPressed){
+                    this.gameState.moveX(this.curMino, 1);
+                    this.Rclock.restart();
+                }
                 if (this.RARRClock.getElapsedTime() > this.arr) {
                     this.RARRClock.restart();
                     this.gameState.moveX(this.curMino, 1);

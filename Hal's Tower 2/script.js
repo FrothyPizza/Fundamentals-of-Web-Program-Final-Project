@@ -898,12 +898,6 @@ home.onclick = function() {
 }
 
 
-// Make it so that when escape is pressed, the game pauses and displays the pause menu
-// The buttons are resume, restart, and credits
-// When the resume button is pressed, the game resumes
-// When the restart button is pressed, the game restarts
-// When the credits button is pressed, the game displays the credits
-// The credits are displayed in the pause menu
 let paused = false;
 function pause() {
     if(!paused) {

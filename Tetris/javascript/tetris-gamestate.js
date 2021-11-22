@@ -75,9 +75,9 @@ class TetrisGameState {
     performHold(mino, next) {
         if (this.canHold) {
             let newHold = mino.mino;
-            if (this.hold < 0 || this.hold >= 7) { // if there is no hold or the hold is an invalid tetromino
-                mino.setTetromino(next[next.length - 1]);
-                next.splice(next.length - 1, 1);
+            if (this.hold < 0 || this.hold >= 7) {
+                mino.setTetromino(next[0]);
+                next.splice(0, 1);
             } else { // if there is a hold, then swap the hold and the current tetromino
                 mino.setTetromino(this.hold);
             }
