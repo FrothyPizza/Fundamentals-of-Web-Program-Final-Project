@@ -22,7 +22,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.7);
     z-index: 100;
     visibility: hidden;
 }
@@ -98,15 +98,20 @@ body {
 }
 
 
-/* #pauseContents #settingsContents input:active {
-    background-color: rgba(0,0,0,0.8);
-    border-width: 2px;
-} */
 
 #pauseContents #settingsContents h3 {
     display: inline-block;
     width: 10em;
     text-align: left;
+}
+
+#pauseContents #settingsContents h2 {
+    margin-bottom: 0.5em;
+    font-size: 1.5em;
+    color: white;
+    text-align: center;
+
+    font-style: italic;
 }
 
 

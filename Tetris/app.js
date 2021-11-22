@@ -51,11 +51,7 @@ settingsButton.onclick = function() {
 
 }
 
-backButton.onclick = function() {
-    settingsContents.style.display = "none";
-    backButton.style.display = "none";
-    mainPauseMenu.style.display = 'block';
-}
+
 
 homeButton.onclick = function() {
     window.location = "../index.html";
@@ -222,6 +218,17 @@ document.addEventListener('keydown', e => {
 
     }
 });
+
+backButton.onclick = function() {
+    settingsContents.style.display = "none";
+    backButton.style.display = "none";
+    mainPauseMenu.style.display = 'block';
+
+    if(currentlySelectedInput != null)
+        currentlySelectedInput.classList.remove('selectedInput');
+    currentlySelectedInput = null;
+
+}
 
 
 
