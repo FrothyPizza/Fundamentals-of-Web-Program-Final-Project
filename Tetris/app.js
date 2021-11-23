@@ -144,6 +144,9 @@ function setControl(id, code) {
         case 'holdInput':
             CONTROLS.HOLD = code;
             break;
+        case 'restartInput':
+            CONTROLS.RESTART = code;
+            break;  
     }
 }
 
@@ -172,6 +175,7 @@ rotate180Input.value = getKeyNameFromCode(CONTROLS.ROTATE_180);
 softDropInput.value = getKeyNameFromCode(CONTROLS.SOFT_DROP);
 hardDropInput.value = getKeyNameFromCode(CONTROLS.HARD_DROP);
 holdInput.value = getKeyNameFromCode(CONTROLS.HOLD);
+restartInput.value = getKeyNameFromCode(CONTROLS.RESTART);
 
 
 

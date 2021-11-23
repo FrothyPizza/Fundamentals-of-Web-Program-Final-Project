@@ -243,7 +243,7 @@ class PlayerTetrisGame {
 
 
         if (keyCode == CONTROLS.RESTART) {
-            this.gameState.resetMatrix();
+            this.gameState.reset();
         }
 
         return 0;

@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     overflow: hidden;
+    font-size: 2.1vh;
 }
 
 body {
@@ -119,3 +120,5 @@ body {
     border-width: 2px;
     background-color: rgba(0,255,0,0.8);
 }
+
+
