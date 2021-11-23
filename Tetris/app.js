@@ -249,15 +249,15 @@ window.setInterval(() => {
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillRect(0, 0, canvas.width, canvas.height);
     if(!paused) {
-        if(keys[DOWN]) playerTetrisGame.inputDown();
-        playerTetrisGame.inputLeft(keys[LEFT], keys[RIGHT]);
-        playerTetrisGame.inputRight(keys[LEFT], keys[RIGHT]);
+        if(keys[CONTROLS.SOFT_DROP]) playerTetrisGame.inputDown();
+        playerTetrisGame.inputLeft(keys[CONTROLS.LEFT], keys[CONTROLS.RIGHT]);
+        playerTetrisGame.inputRight(keys[CONTROLS.LEFT], keys[CONTROLS.RIGHT]);
 
 
     }
 
     // Draw the game centered on screen
-    blockSize = 30;
+    blockSize = Math.round(canvas.height / (HEIGHT-YMARGIN + 4));
     let xOffset = (canvas.width - WIDTH * blockSize) / 2;
     let yOffset = (canvas.height - (HEIGHT - YMARGIN) * blockSize) / 2;
     playerTetrisGame.render(context, {x: xOffset, y: yOffset}, blockSize);

@@ -94,9 +94,9 @@ class PlayerTetrisGame {
         this.RARRClock.start();
         this.SDFClock.start();
 
-        this.das = 90;
-        this.sdf = 0;
-        this.arr = 0;
+        this.das = 133;
+        this.sdf = 5;
+        this.arr = 10;
 
 
 
@@ -203,10 +203,24 @@ class PlayerTetrisGame {
             //piecesPlaced++;
 
             let clear = this.gameState.lastClear;
-            if (clear <= 0) this.gameState.placeGarbage();
+            if (clear <= 0) {
+                this.gameState.placeGarbage();
+                let sound = new Audio("sounds/hard_drop.wav");
+                sound.play();
+            }
+            else {
+                // let pitch = 1.0 + (this.gameState.combo / 16.0);
+                // let sound = new Audio("sounds/line_clear.wav");
+                // sound.playbackRate = pitch;
+                // sound.play();
+
+                let sound = new Audio("sounds/line_clear.wav");
+                sound.play();
+            }
+
 
             let attack = this.gameState.lastAttack;
-
+            
 
 
 
@@ -226,6 +240,8 @@ class PlayerTetrisGame {
         if (keyCode == CONTROLS.ROTATE_180) {
             this.gameState.rotate(this.curMino, 2);
         }
+
+
         if (keyCode == CONTROLS.RESTART) {
             this.gameState.resetMatrix();
         }
