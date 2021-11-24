@@ -61,12 +61,39 @@ class TetrisGameState {
         this.totalLinesSent = 0;
         this.b2b = 0;
 
+        this.lastAttack = 0;
+        this.lastTSpin = 0;
+
         this.incomingGarbage = [];
         
         this.matrix = [];
         for(let i = 0; i < WIDTH*HEIGHT; ++i) {
             this.matrix[i] = -1;
         }
+    }
+
+    clone() {
+        let newState = new TetrisGameState();
+        newState.hold = this.hold;
+        newState.canHold = this.canHold;
+        newState.combo = this.combo;
+        newState.lastMoveWasKick = this.lastMoveWasKick;
+        newState.lastMoveWasRot = this.lastMoveWasRot;
+        newState.totalLinesCleared = this.totalLinesCleared;
+        newState.totalLinesSent = this.totalLinesSent;
+        newState.b2b = this.b2b;
+
+        newState.incomingGarbage = [];
+        for(let i = 0; i < this.incomingGarbage.length; ++i) {
+            newState.incomingGarbage.push(this.incomingGarbage[i]);
+        }
+
+        newState.matrix = [];
+        for(let i = 0; i < WIDTH*HEIGHT; ++i) {
+            newState.matrix[i] = this.matrix[i];
+        }
+
+        return newState;
     }
 
 
@@ -444,8 +471,8 @@ class TetrisGameState {
 
 	// pass in the tetromino where it was before hard drop, and then test it int the matrix before hard drop
     isTspin(mino) {
-        if (mino.mino != MINO_T) return false;
-        if (!this.lastMoveWasRot) return false;
+        if (mino.mino != MINO_T) return NO_TSPIN;
+        if (!this.lastMoveWasRot) return NO_TSPIN;
 
         let cornersFilled = 0;
         // C T C
@@ -489,9 +516,9 @@ class TetrisGameState {
             if (mino.rotation == 1 || mino.rotation == 2) mainCellsFilled++;
         }
 
-        if (cornersFilled >= 3 && mainCellsFilled >= 2) return true;
-        else if (cornersFilled >= 3) return true;
-        return false;
+        if (cornersFilled >= 3 && mainCellsFilled >= 2) return TSPIN;
+        else if (cornersFilled >= 3) return TSPIN_MINI;
+        return NO_TSPIN;
     }
 
 
@@ -505,6 +532,8 @@ class TetrisGameState {
                 if (i != 0) this.lastMoveWasKick = false;
                 mino.y--;
                 this.lastTSpin = this.isTspin(mino);
+                
+
                 this.pasteToMatrix(mino);
 
                 this.lastClear = this.clearLines();

@@ -108,3 +108,5 @@ let CONTROLS = {
     ROTATE_180: 88,
     RESTART: 82
 };
+
+const AI_SEARCH_WIDTH = 10;

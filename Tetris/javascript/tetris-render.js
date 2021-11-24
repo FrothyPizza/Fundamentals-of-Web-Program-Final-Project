@@ -24,7 +24,7 @@ function getColor(mino) {
 
 
 
-function renderTetris(context, position, tileSize, gameState, mino, nextList) {
+function renderTetris(context, position, tileSize, gameState, mino, nextList, renderAI) {
 
     // Draw matrix
     // don't render the top two tiles
@@ -100,6 +100,35 @@ function renderTetris(context, position, tileSize, gameState, mino, nextList) {
             context.fillRect(tileSize * (hold.x + hold.data[i].x) + position.x, tileSize * (hold.y + hold.data[i].y - YMARGIN) + position.y, tileSize, tileSize);
         }
     }
+
+    // If AI is rendering, draw the AI's current move as a line going through where the tetromino will land
+    if (renderAI) {
+        let state = gameState.clone();
+        let tetromino = new Tetromino(mino.mino);
+        let next = nextList.slice();
+
+        let move = findBestMove(state, tetromino.mino, next);
+        if(move.moves == [HOLD]) {
+            state.performHold(tetromino, next);
+            move = findBestMove(state, tetromino.mino, next);
+        }
+
+        move.moves[move.length - 1] = MOVE_DD;
+
+        fullyPerformMove(state, tetromino, move.moves, next);
+        
+        // Now that the tetromino is in the correct position, draw it
+        for (let i = 0; i < 4; ++i) {
+            context.fillStyle = getColor(tetromino.mino);
+            context.fillStyle.alpha = 0.5;
+
+            let centeredBlockSize = tileSize / 2;
+            context.fillRect(tileSize * (tetromino.x + tetromino.data[i].x) + position.x + centeredBlockSize/2, tileSize * (tetromino.y + tetromino.data[i].y - YMARGIN) + position.y + centeredBlockSize/2, centeredBlockSize, centeredBlockSize);
+        }
+
+
+    }
+
 
 
 

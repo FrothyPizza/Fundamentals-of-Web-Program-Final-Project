@@ -102,6 +102,22 @@ class PlayerTetrisGame {
 
     }
 
+    restart() {
+        this.gameState.reset();
+        this.nextList = [];
+        for(var i = 0; i < 14; i++) {
+            pushOntoNextlist(this.nextList);
+        }
+        this.curMino = new Tetromino(this.nextList[0]);
+        this.nextList.splice(0, 1);
+
+        this.Lclock.restart();
+        this.LARRClock.restart();
+        this.Rclock.restart();
+        this.RARRClock.restart();
+        this.SDFClock.restart();
+    }
+
 
 
     inputLeft(leftPressed, rightPressed) {
@@ -193,9 +209,6 @@ class PlayerTetrisGame {
     inputGeneral(keyCode) {
         // hard drop
         if (keyCode == CONTROLS.HARD_DROP) {
-            let mino = this.curMino.mino;
-            let oldMino = new Tetromino(this.curMino);
-            let oldState = new TetrisGameState(this.gameState);
             this.gameState.hardDrop(this.curMino);
             this.curMino.setTetromino(this.nextList[0]);
             this.nextList.splice(0, 1);
@@ -207,14 +220,18 @@ class PlayerTetrisGame {
                 this.gameState.placeGarbage();
                 let sound = new Audio("sounds/hard_drop.wav");
                 sound.play();
-            }
-            else {
+            } else {
                 // let pitch = 1.0 + (this.gameState.combo / 16.0);
                 // let sound = new Audio("sounds/line_clear.wav");
                 // sound.playbackRate = pitch;
                 // sound.play();
 
                 let sound = new Audio("sounds/line_clear.wav");
+                sound.play();
+            }
+            
+            if(this.gameState.lastTSpin != NO_TSPIN) {
+                let sound = new Audio("sounds/t_spin.wav");
                 sound.play();
             }
 
@@ -242,8 +259,20 @@ class PlayerTetrisGame {
         }
 
 
+
+
+        if (keyCode == 80) {
+            let move = findBestMove(this.gameState, this.curMino.mino, this.nextList, 0, 3);
+            console.log(move);
+            fullyPerformMove(this.gameState, this.curMino, move.moves, this.nextList);
+            this.curMino.setTetromino(this.nextList[0]);
+            this.nextList.splice(0, 1);
+            if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
+        }
+
+
         if (keyCode == CONTROLS.RESTART) {
-            this.gameState.reset();
+            this.restart();
         }
 
         return 0;
@@ -251,7 +280,7 @@ class PlayerTetrisGame {
 
 
     render(context, position, tileSize) {
-        renderTetris(context, position, tileSize, this.gameState, this.curMino, this.nextList);
+        renderTetris(context, position, tileSize, this.gameState, this.curMino, this.nextList, true);
     }
 }
 
