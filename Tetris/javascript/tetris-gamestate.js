@@ -471,8 +471,7 @@ class TetrisGameState {
 
 	// pass in the tetromino where it was before hard drop, and then test it int the matrix before hard drop
     isTspin(mino) {
-        if (mino.mino != MINO_T) return NO_TSPIN;
-        if (!this.lastMoveWasRot) return NO_TSPIN;
+        if (mino.mino != MINO_T || !this.lastMoveWasRot) return NO_TSPIN;
 
         let cornersFilled = 0;
         // C T C
@@ -543,8 +542,8 @@ class TetrisGameState {
                 // handle back to back
                 if (this.lastClear == 4 || this.lastTSpin != NO_TSPIN && this.lastClear > 0)
                     this.b2b++;
-                else
-                    if (this.lastClear > 0) this.b2b = 0;
+                else if (this.lastClear > 0) 
+                    this.b2b = 0;
 
                 if (this.lastClear == 0) this.lastAttack = 0;
                 return i;

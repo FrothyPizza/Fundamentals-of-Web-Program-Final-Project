@@ -24,7 +24,7 @@ function getColor(mino) {
 
 
 
-function renderTetris(context, position, tileSize, gameState, mino, nextList, renderAI) {
+function renderTetris(context, position, tileSize, gameState, mino, nextList, AIMoves, AIMoveIndex) {
 
     // Draw matrix
     // don't render the top two tiles
@@ -79,7 +79,7 @@ function renderTetris(context, position, tileSize, gameState, mino, nextList, re
 
     // Draw next list
     let next = new Tetromino(mino);
-    for (let i = 0; i < 5; ++i) {
+    for (let i = 0; i < PREVIEWS; ++i) {
         next.setTetromino(nextList[i]);
         next.x = WIDTH + 3; next.y = YMARGIN + i * 3;
         let posModifier = {};
@@ -102,12 +102,16 @@ function renderTetris(context, position, tileSize, gameState, mino, nextList, re
     }
 
     // If AI is rendering, draw the AI's current move as a line going through where the tetromino will land
-    if (renderAI) {
+    if (AIMoves != null && AIMoves.length > 0) {
+        if(AIMoveIndex == null) AIMoveIndex = 0;
+        let move = AIMoves[AIMoveIndex];
+        
+
         let state = gameState.clone();
         let tetromino = new Tetromino(mino.mino);
         let next = nextList.slice();
 
-        let move = findBestMove(state, tetromino.mino, next);
+        //let move = findBestMove(state, tetromino.mino, next);
         if(move.moves == [HOLD]) {
             state.performHold(tetromino, next);
             move = findBestMove(state, tetromino.mino, next);

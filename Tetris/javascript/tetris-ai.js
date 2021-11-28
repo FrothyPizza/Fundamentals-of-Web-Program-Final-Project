@@ -1,15 +1,30 @@
 
 let AIfactor = {
-    hole: -90,                // how bad holes are
-    holeCovered: -50,         // how many blocks are above a hole (bad)
-    heightVariance: -10,      // average height differance between adjacent columns
-    averageHeight: -5,        // average height
-    highestHeight: -5,      // highest height
-    Idependency: -40,         // number of columns with 2 adjacent columns 3 higher than the one
-    partialIdependency: -10,  // number of columns with 2 adjacent columns >=2 higher than this one
-    surfaceParity: 2,        // https://harddrop.com/wiki/Parity
+    hole: -100,                       // how bad holes are
+    holeCovered: -30,                 // how many blocks are above a hole (bad)
 
-    holdPenalty: -70,         
+    heightVariance: -12,              // average height differance between adjacent columns
+    averageHeight: -7,                // average height
+    averageHeightSQ: -0.2,            // average height squared
+    highestHeight: -2,                // highest height
+    
+    upstackThreshold: 6,              // how high it wants to stack before stacking higher is bad
+    averageHeightBelowUpstack: 100,   // how much higher it wants to stack
+
+    downstackThreshold: 14,           // how high the matrix must be before it heavily favors downstacking
+    averageHeightAboveThreshold: -20,  // how bad the average height is above the threshold
+
+
+    Idependency: -50,                 // number of columns with 2 adjacent columns 3 higher than the one
+    deepIdependency: -100,             // number of columns with 2 adjacent columns 6 higher than the one
+    partialIdependency: -20,          // number of columns with 2 adjacent columns >=2 higher than this one
+    surfaceParity: -4,                // https://harddrop.com/wiki/Parity
+
+    blocksInTenthColumn: 0,        // how many blocks are in the tenth column (used for stacking for tetrises)
+    tetrisReady: 200,                 // it is good if it's tetris ready      
+
+
+    holdPenalty: -30,         
 
     attack: 0, 
     attackEffeciency: 0,
@@ -17,6 +32,7 @@ let AIfactor = {
     clearedDoubleOrTriple: 0,
     tSpinSetup: 0,
     performedTSpin: 0,
+    clearedTetris: 500,
 };
 
 
@@ -137,6 +153,150 @@ const I_MOVES = [
     [ROT_CW, MOVE_RR, MOVE_HD],
 ];
 
+
+
+function executeMove(gameState, mino, moves, index, nextList) {
+    switch (moves[index]) {
+        case HOLD:
+            gameState.performHold(mino, nextList);
+            break;
+        case MOVE_R:
+            gameState.moveX(mino, 1);
+            break;
+        case MOVE_RR:
+            gameState.arrX(mino, 1);
+            break;
+        case MOVE_LL:
+            gameState.arrX(mino, -1);
+            break;
+        case MOVE_L:
+            gameState.moveX(mino, -1);
+            break;
+        case ROT_CW:
+            gameState.rotate(mino, 1);
+            break;
+        case ROT_CCW:
+            gameState.rotate(mino, -1);
+            break;
+        case ROT_180:
+            gameState.rotate(mino, 2);
+            break;
+        case MOVE_DD:
+            gameState.sonicDrop(mino);
+            break;
+        case MOVE_HD:
+            gameState.hardDrop(mino);
+            return gameState.lastAttack;
+            break;
+        
+    }
+    return 0;
+}
+
+
+
+function fullyPerformMove(gameState, mino, moves, nextList) {
+    let clear = 0;
+    for (let i = 0; i < moves.length; ++i) {
+        clear += executeMove(gameState, mino, moves, i, nextList);
+    }
+    return clear;
+}
+
+
+
+
+class EndPosition {
+    constructor(x, y, rot) {
+        this.x = x;
+        this.y = y;
+        this.rot = rot;
+    }
+
+    equals(other) {
+        return this.x == other.x && this.y == other.y && this.rot == other.rot;
+    }
+}
+
+
+
+const AI_ACTIONS = [MOVE_L, MOVE_LL, MOVE_R, MOVE_RR, ROT_CW, ROT_CCW, MOVE_DD];
+function pathfindToEndPosition(gameState, minoIndex, endPosition) {
+
+
+}
+
+
+
+
+
+
+
+
+
+function findAllHoles(gameState) {
+    let holes = [];
+    for (let i = 0; i < WIDTH; ++i) {
+        let foundTopMostBlock = false;
+        for (let j = 1; j < HEIGHT; ++j) {
+            // Once we've found the topmost block of a column, any empty block below it is a hole
+            if (foundTopMostBlock && gameState.matrix[i + j*WIDTH] == -1)
+                holes.push({ x: i, y: j });
+
+            if (gameState.matrix[i + j*WIDTH] >= 0)
+                foundTopMostBlock = true;
+        }
+    }
+
+    return holes;
+}
+
+function findAllUniqueMoves(gameState, minoIndex) {
+    let endPositions = [];
+    let holes = findAllHoles(gameState);
+
+    let possibleRotations = 4;
+    if (minoIndex == MINO_I || minoIndex == MINO_S || minoIndex == MINO_Z)
+        possibleRotations = 2;
+    if (minoIndex == MINO_O)
+        possibleRotations = 1;
+    
+    for (let hole of holes) {
+        for (let i = 0; i < possibleRotations; ++i) {
+            let mino = new Tetromino(minoIndex);
+            for (let r = 0; r < i; ++r)
+                gameState.rotate(mino, 1);
+
+            for (let j = 0; j < 4; ++j) {
+                let thisTilePos = { x: mino.x + mino.data[j].x, y: mino.y + mino.data[j].y };
+
+                mino.x += hole.x - thisTilePos.x;
+                mino.y += hole.y - thisTilePos.y;
+
+                if (gameState.softDrop(mino)) continue;
+
+                if (!gameState.matrixContains(mino)) {
+                    endPositions.push({ x: mino.x, y: mino.y, rot: i });
+                    break;
+                }
+            }
+        }
+
+    }
+
+    return endPositions;
+}
+
+
+
+
+
+
+
+
+
+
+
 function getMoves(mino) {
     if (mino == MINO_S || mino == MINO_Z)
         return SZ_MOVES;
@@ -157,7 +317,7 @@ function evaluate(gameState) {
     // if dead (need to work on this)
     for (let i = 3; i < 6; ++i)
         for (let j = 3; j < 5; ++j)
-            if (gameState.matrix[i][j] >= 0) return -10000;
+            if (gameState.matrix[i + j * WIDTH] >= 0) return -10000;
     
     //find holes
     let holePositions = [];
@@ -212,12 +372,19 @@ function evaluate(gameState) {
     }
     averageHeight /= columnHeights.length;
     score += averageHeight * AIfactor.averageHeight;
+    score += averageHeight * averageHeight * AIfactor.averageHeightSQ;
     score += highestHeight * AIfactor.highestHeight;
-    if (averageHeight > 10) score += averageHeight * AIfactor.averageHeight;
+
+    if(averageHeight > AIfactor.downstackThreshold)
+        score += AIfactor.averageHeightAboveThreshold * averageHeight;
+
+    if(averageHeight < AIfactor.upstackThreshold)
+        score += AIfactor.averageHeightBelowUpstack * averageHeight;
 
 
     // Calculate I dependencies and height variance
     let Idependencies = 0;
+    let deepIdependencies = 0;
     let variance = 0;
     for (let i = 0; i < columnHeights.length; ++i) {
         let leftHeight = 0;
@@ -238,8 +405,10 @@ function evaluate(gameState) {
         else rightHeight = columnHeights[i + 1];
 
         if (leftHeight - thisHeight >= 3 && rightHeight - thisHeight >= 3) Idependencies++;
+        if (leftHeight - thisHeight >= 6 && rightHeight - thisHeight >= 6) deepIdependencies++;
     }
     score += Idependencies * AIfactor.Idependency;
+    score += deepIdependencies * AIfactor.deepIdependency;
     score += variance * AIfactor.heightVariance;
 
 
@@ -253,6 +422,31 @@ function evaluate(gameState) {
     parity /= 2;
     parity = Math.abs(parity);
     score += parity * AIfactor.surfaceParity;
+
+    // Blocks in tenth column
+    let tenthColumnBlocks = 0;
+    for(let i = 0; i < HEIGHT; ++i) {
+        if (gameState.matrix[WIDTH-1 + i * WIDTH] >= 0) tenthColumnBlocks++;
+    }
+    score += tenthColumnBlocks * AIfactor.blocksInTenthColumn;
+
+
+    // Check to see if it's tetris ready
+    // if all of the columns are higher than column 10 by 4, then it's tetris ready
+    let tetrisReady = true;
+    for (let i = 0; i < columnHeights.length-1; ++i) {
+        if(columnHeights[i] - columnHeights[columnHeights.length-1] < 4) {
+            tetrisReady = false;
+            break;
+        }
+    }
+    score += tetrisReady * AIfactor.tetrisReady;
+
+
+
+
+
+
 
 
 
@@ -276,9 +470,11 @@ function evaluateAttackScore(attack, clear, tSpin) {
 
     if (clear == 2 || clear == 3) score += AIfactor.clearedDoubleOrTriple;
 
+    if (clear == 4) score += AIfactor.clearedTetris;
+
     // clear without attack
     if (clear > 0 && attack == 0) {
-        score += clear * AIfactor.clearWithoutAttack + AIfactor.clearedDoubleOrTriple;
+        score += clear * AIfactor.clearWithoutAttack;
     }
 
     // attack efficiency
@@ -299,53 +495,6 @@ function evaluateAttackScore(attack, clear, tSpin) {
 
 
 
-function executeMove(gameState, mino, moves, index, nextList) {
-    switch (moves[index]) {
-        case HOLD:
-            gameState.performHold(mino, nextList);
-            break;
-        case MOVE_R:
-            gameState.moveX(mino, 1);
-            break;
-        case MOVE_RR:
-            gameState.arrX(mino, 1);
-            break;
-        case MOVE_LL:
-            gameState.arrX(mino, -1);
-            break;
-        case MOVE_L:
-            gameState.moveX(mino, -1);
-            break;
-        case ROT_CW:
-            gameState.rotate(mino, 1);
-            break;
-        case ROT_CCW:
-            gameState.rotate(mino, -1);
-            break;
-        case ROT_180:
-            gameState.rotate(mino, 2);
-            break;
-        case MOVE_DD:
-            gameState.sonicDrop(mino);
-            break;
-        case MOVE_HD:
-            gameState.hardDrop(mino);
-            return gameState.lastAttack;
-            break;
-        
-    }
-    return 0;
-}
-
-
-
-function fullyPerformMove(gameState, mino, moves, nextList) {
-    let clear = 0;
-    for (let i = 0; i < moves.length; ++i) {
-        clear += executeMove(gameState, mino, moves, i, nextList);
-    }
-    return clear;
-}
 
 
 
@@ -354,15 +503,11 @@ function fullyPerformMove(gameState, mino, moves, nextList) {
 
 
 
-// For the sake of simplcity, the AI will only consider the first move in the list
-function findBestMove(gameState, mino, nextList) {
 
-    let bestMove = {
-        score: -100000,
-        moves: []
-    };
+function findBestMoves(gameState, mino, nextList) {
 
     let allMoves = getMoves(mino);
+    let bestMoves = [];
     
     for (let i = 0; i < allMoves.length; ++i) {
         let newMino = new Tetromino(mino);
@@ -371,20 +516,20 @@ function findBestMove(gameState, mino, nextList) {
         // Copy the move into move
         let move = allMoves[i].slice();
 
-        let clear = fullyPerformMove(newGameState, newMino, move, nextList);
+        fullyPerformMove(newGameState, newMino, move, nextList);
+        let clear = newGameState.lastClear;
         let attack = newGameState.lastAttack;
         let tSpin = newGameState.lastTSpin;
         
-        let attackScore = 0; //evaluateAttackScore(attack, clear, tSpin);
+        let attackScore = evaluateAttackScore(attack, clear, tSpin);
         let moveScore = evaluate(newGameState);
 
         let score = attackScore + moveScore;
 
-
-        if (score > bestMove.score) {
-            bestMove.score = score;
-            bestMove.moves = move;
-        }
+        bestMoves.push({
+            moves: move,
+            score: score
+        });
     }
 
     if(gameState.canHold) {
@@ -399,158 +544,138 @@ function findBestMove(gameState, mino, nextList) {
             let newGameState = holdState.clone();
             let move = allMovesWithHold[i].slice();
 
-            let clear = fullyPerformMove(newGameState, newMino, move, holdNext);
+            fullyPerformMove(newGameState, newMino, move, nextList);
+            let clear = newGameState.lastClear;
             let attack = newGameState.lastAttack;
             let tSpin = newGameState.lastTSpin;
-
-            let attackScore = 0; //evaluateAttackScore(attack, clear, tSpin);
+            
+            let attackScore = evaluateAttackScore(attack, clear, tSpin);
             let moveScore = evaluate(newGameState);
 
             let score = attackScore + moveScore + AIfactor.holdPenalty;
 
-            if (score > bestMove.score) {
-                bestMove.score = score;
-                bestMove.moves = [HOLD];
-                return bestMove;
-            }
+            bestMoves.push({
+                moves: [HOLD],
+                score: score
+            });
         }
     }
 
+    // Sort the moves by score
+    bestMoves.sort(function(a, b) {
+        return b.score - a.score;
+    });
 
+    // remove all moves that are hold other than the first
+    let holdIndecies = [];
+    for (let i = 0; i < bestMoves.length; ++i) {
+        if (bestMoves[i].moves[0] == HOLD) holdIndecies.push(i);
+    }
+    for (let i = holdIndecies.length - 1; i >= 1; --i) {
+        bestMoves.splice(holdIndecies[i], 1);
+    }
 
-    return bestMove;
+    
+
+    return bestMoves;
 }
 
 
-
-
-
-
-
-// Search for the best move using a depth-first search
-function findBestMoveDFS(gameState, mino, nextList, depth) {
-    
-    let bestMove = {
-        score: -100000,
-        moves: []
-    };
+function findBestMovesDFS(gameState, mino, nextList, depth, maxDepth) {
 
     let allMoves = getMoves(mino);
-
+    let bestMoves = [];
+    
     for (let i = 0; i < allMoves.length; ++i) {
         let newMino = new Tetromino(mino);
         let newGameState = gameState.clone();
         
         // Copy the move into move
         let move = allMoves[i].slice();
-        move.push(MOVE_HD);
 
-        let clear = fullyPerformMove(newGameState, newMino, move, nextList);
+        fullyPerformMove(newGameState, newMino, move, nextList);
+        let clear = newGameState.lastClear;
         let attack = newGameState.lastAttack;
         let tSpin = newGameState.lastTSpin;
         
-        let attackScore = 0; //evaluateAttackScore(attack, clear, tSpin);
+        let attackScore = evaluateAttackScore(attack, clear, tSpin);
         let moveScore = evaluate(newGameState);
 
         let score = attackScore + moveScore;
+        if(depth < maxDepth) {
+            let newNextList = nextList.slice();
+            newNextList.shift();
+            let newMinoIndex = nextList[0];
+            score = findBestMovesDFS(newGameState, newMinoIndex, newNextList, depth + 1, maxDepth)[0].score + attackScore;
 
-        if (depth > 0) {
-            let newMino = nextList[0];
-            let newNextList = nextList.slice(1);
-            let newGameState = gameState.clone();
-            let newDepth = depth - 1;
-            let newBestMove = findBestMoveDFS(newGameState, newMino, newNextList, newDepth);
-            score += newBestMove.score;
         }
 
-        if (score > bestMove.score) {
-            bestMove.score = score;
-            bestMove.moves = move;
-        }
-    }
-
-    bestMove.moves.push(MOVE_HD);
-    return bestMove;
-}
 
 
-
-
-function findBestMove2(currentState, minoIndex, nextList, thisPathAttackScore, depth) {
-    let bestMove = [];
-    let bestScore = -10000;
-
-    let allMoves = getMoves(minoIndex);
-    let allNewStates = [];
-    let evaluations = [];
-    let attackEvaluations = [];
-
-    for (let i = 0; i < allMoves.length; ++i) {
-        let newState = currentState.clone();
-        let mino = new Tetromino(minoIndex);
-        let newNext = nextList.slice();
-
-        fullyPerformMove(newState, mino, allMoves[i], newNext);
-        let evaluation = evaluate(newState);
-        let atkScore = evaluateAttackScore(
-            AIfactor, newState.lastAttack, newState.lastClear, newState.lastTSpin
-        );
-        //evaluation += atkScore;
-
-        attackEvaluations.push(atkScore);
-        evaluations.push(evaluation);
-        allNewStates.push(newState);
+        bestMoves.push({
+            moves: move,
+            score: score
+        });
     }
 
 
-    if (depth == 0) {
-        for (let i = 0; i < evaluations.length; ++i) {
-            if (evaluations[i] + attackEvaluations[i] > bestScore) {
-                bestMove = allMoves[i];
-                bestScore = evaluations[i] + attackEvaluations[i];
-            }
-        }
-    } else {
-        let bestMovesToBeConsidered = AI_SEARCH_WIDTH;
-        if (minoIndex == MINO_O && AI_SEARCH_WIDTH > 8) bestMovesToBeConsidered = 8;
-        if (bestMovesToBeConsidered > allMoves.length) bestMovesToBeConsidered = allMoves.length;
+    let bestMovesWithHold = [];
+    // if(gameState.canHold) {
+    //     let holdNext = nextList.slice();
+    //     let holdState = gameState.clone();
+    //     let holdMino = new Tetromino(mino);
+    //     holdState.performHold(holdMino, holdNext);
 
-        let bestIndexes = [];
-        for (let i = 0; i < bestMovesToBeConsidered; ++i) {
-            let bestIndex = 0;
-            let bestEvaluation = -10000;
-            // loop through all evaluations and find the best one that hasn't already been considered
-            for (let j = 0; j < evaluations.length; ++j) {
-                let bestIndexesHasJ = false;
-                for (let c = 0; c < bestIndexes.length; ++c)
-                    if (j == bestIndexes[c]) // if the index being considered has already been added, don't add it
-                        bestIndexesHasJ = true;
-                if (evaluations[j] > bestEvaluation && bestIndexesHasJ == false) {
-                    bestEvaluation = evaluations[j];
-                    bestIndex = j;
-                }
-            }
-            bestIndexes.push(bestIndex);
+    //     let allMovesWithHold = getMoves(holdMino.mino);
+    //     for (let i = 0; i < allMovesWithHold.length; ++i) {
+    //         let newMino = new Tetromino(holdMino);
+    //         let newGameState = holdState.clone();
+    //         let move = allMovesWithHold[i].slice();
 
-        }
-        for (let i = 0; i < bestIndexes.length; ++i) {
-            let thisState = allNewStates[bestIndexes[i]];
-            let thisMino = new Tetromino(nextList[0]);
-            let newNext = nextList.slice();
-            let move = findBestMove(thisState, nextList[0], newNext, thisPathAttackScore + attackEvaluations[bestIndexes[i]], depth - 1);
-            fullyPerformMove(thisState, thisMino, move, newNext);
+    //         fullyPerformMove(newGameState, newMino, move, nextList);
+    //         let clear = newGameState.lastClear;
+    //         let attack = newGameState.lastAttack;
+    //         let tSpin = newGameState.lastTSpin;
+            
+    //         let attackScore = evaluateAttackScore(attack, clear, tSpin);
+    //         let moveScore = evaluate(newGameState);
 
-            let evaluation = evaluate(thisState) + evaluateAttackScore(
-                AIfactor, thisState.lastAttack, thisState.lastClear, thisState.lastTSpin
-            );
+    //         let score = attackScore + moveScore + AIfactor.holdPenalty;
+    //         if(depth < maxDepth) {
+    //             let newNextList = nextList.slice();
+    //             newNextList.shift();
+    //             let newMinoIndex = nextList[0];
+    //             score = findBestMovesDFS(newGameState, newMinoIndex, newNextList, depth + 1, maxDepth)[0].score;// + AIfactor.holdPenalty;
+                
+    //         }
 
-            if (evaluation > bestScore) {
-                bestScore = evaluation;
-                bestMove = allMoves[bestIndexes[i]];
-                i = bestIndexes.length; // if holding is better, don't evaluate any more
-            }
-        }
+            
+
+    //         bestMovesWithHold.push({
+    //             moves: [HOLD],
+    //             score: score
+    //         });
+    //     }
+    // }
+
+
+
+
+    // Sort the moves by score
+    bestMoves.sort(function(a, b) {
+        return b.score - a.score;
+    });
+
+    // remove all moves that are hold other than the first
+    let holdIndecies = [];
+    for (let i = 0; i < bestMoves.length; ++i) {
+        if (bestMoves[i].moves[0] == HOLD) holdIndecies.push(i);
+    }
+    for (let i = holdIndecies.length - 1; i >= 1; --i) {
+        bestMoves.splice(holdIndecies[i], 1);
     }
 
-    return bestMove;
+    
+
+    return bestMoves;
 }

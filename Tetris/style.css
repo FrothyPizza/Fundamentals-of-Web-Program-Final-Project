@@ -3,6 +3,7 @@
     padding: 0;
     overflow: hidden;
     font-size: 2.1vh;
+    font-family: 'Roboto', sans-serif;
 }
 
 body {
@@ -26,7 +27,12 @@ body {
     background-color: rgba(0,0,0,0.7);
     z-index: 100;
     visibility: hidden;
+
+
 }
+
+
+
 
 #pauseContents {
     position: absolute;

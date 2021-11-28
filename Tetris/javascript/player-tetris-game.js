@@ -98,9 +98,25 @@ class PlayerTetrisGame {
         this.sdf = 5;
         this.arr = 10;
 
+        this.piecesPlaced = 0;
 
+        this.ai_worker = new Worker("javascript/ai-worker.js");
+
+        this.updateBestMoves();
 
     }
+
+    updateBestMoves() {
+        //this.sortedAIMoves = findBestMoves(this.gameState, this.curMino.mino, this.nextList);
+        //this.sortedAIMoves = findBestMovesDFS(this.gameState, this.curMino.mino, this.nextList, 0, 1);
+
+        this.sortedAIMoves = null;
+        this.ai_worker.postMessage({ args : [this.gameState, this.curMino.mino, this.nextList] });
+        this.ai_worker.onmessage = (e) => {
+            this.sortedAIMoves = e.data;
+        }
+    }
+
 
     restart() {
         this.gameState.reset();
@@ -209,12 +225,17 @@ class PlayerTetrisGame {
     inputGeneral(keyCode) {
         // hard drop
         if (keyCode == CONTROLS.HARD_DROP) {
+            //console.log(findAllUniqueMoves(this.gameState, this.curMino));
+
             this.gameState.hardDrop(this.curMino);
             this.curMino.setTetromino(this.nextList[0]);
             this.nextList.splice(0, 1);
             if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
-            //piecesPlaced++;
+            this.piecesPlaced++;
+            
+            this.updateBestMoves();
 
+            
             let clear = this.gameState.lastClear;
             if (clear <= 0) {
                 this.gameState.placeGarbage();
@@ -247,6 +268,7 @@ class PlayerTetrisGame {
         
         if (keyCode == CONTROLS.HOLD) {
             this.gameState.performHold(this.curMino, this.nextList);
+            this.updateBestMoves();
         }
         if (keyCode == CONTROLS.ROTATE_CW) {
             this.gameState.rotate(this.curMino, 1);
@@ -262,12 +284,14 @@ class PlayerTetrisGame {
 
 
         if (keyCode == 80) {
-            let move = findBestMove(this.gameState, this.curMino.mino, this.nextList, 0, 3);
-            console.log(move);
-            fullyPerformMove(this.gameState, this.curMino, move.moves, this.nextList);
-            this.curMino.setTetromino(this.nextList[0]);
-            this.nextList.splice(0, 1);
-            if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
+            if(this.sortedAIMoves != null) {
+                let move = this.sortedAIMoves[0];
+                fullyPerformMove(this.gameState, this.curMino, move.moves, this.nextList);
+                this.curMino.setTetromino(this.nextList[0]);
+                this.nextList.splice(0, 1);
+                if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
+                this.updateBestMoves();
+            }
         }
 
 
@@ -280,7 +304,7 @@ class PlayerTetrisGame {
 
 
     render(context, position, tileSize) {
-        renderTetris(context, position, tileSize, this.gameState, this.curMino, this.nextList, true);
+        renderTetris(context, position, tileSize, this.gameState, this.curMino, this.nextList, this.sortedAIMoves);
     }
 }
 

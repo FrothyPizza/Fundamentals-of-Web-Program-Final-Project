@@ -4,6 +4,8 @@ const HEIGHT = 25;
 const YMARGIN = HEIGHT - 20; // This is the top margin of the game matrix that is part of the game board but invisible
 const TETROMINO_START_Y = 1;
 
+const PREVIEWS = 1;
+
 const COMBO_TABLE = [
     0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 4, 5
 ];
