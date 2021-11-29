@@ -120,7 +120,6 @@ const LJT_MOVES = [
 const O_MOVES = [
     [MOVE_LL, MOVE_HD],
     [MOVE_LL, MOVE_R, MOVE_HD],
-    [MOVE_L, MOVE_HD],
     [MOVE_L, MOVE_L, MOVE_HD],
     [MOVE_L, MOVE_HD],
     [MOVE_HD],
@@ -598,7 +597,8 @@ function findBestMoves(gameState, mino, nextList) {
 
 
 
-
+// TODO: beam search
+let ai_nodes_evaluated = 0;
 function findBestMovesDFS(gameState, mino, nextList, depth, maxDepth) {
 
     let allMoves = getMoves(mino);
@@ -617,16 +617,21 @@ function findBestMovesDFS(gameState, mino, nextList, depth, maxDepth) {
         let tSpin = newGameState.lastTSpin;
         
         let attackScore = evaluateAttackScore(attack, clear, tSpin);
-        let moveScore = evaluate(newGameState);
+        //let moveScore = evaluate(newGameState);
 
-        let score = attackScore + moveScore;
+        //let score = attackScore + moveScore;
         if(depth < maxDepth) {
             let newNextList = nextList.slice();
             newNextList.shift();
             let newMinoIndex = nextList[0];
             score = findBestMovesDFS(newGameState, newMinoIndex, newNextList, depth + 1, maxDepth)[0].score + attackScore;
 
+        } else {
+            score = evaluate(newGameState) + attackScore;
+            ai_nodes_evaluated++;
         }
+
+        
 
 
 
@@ -656,16 +661,21 @@ function findBestMovesDFS(gameState, mino, nextList, depth, maxDepth) {
             let tSpin = newGameState.lastTSpin;
             
             let attackScore = evaluateAttackScore(attack, clear, tSpin);
-            let moveScore = evaluate(newGameState);
+            //let moveScore = evaluate(newGameState);
 
-            let score = attackScore + moveScore + AIfactors.holdPenalty;
+            //let score = attackScore + moveScore + AIfactors.holdPenalty;
             if(depth < maxDepth) {
                 let newNextList = nextList.slice();
                 newNextList.shift();
                 let newMinoIndex = nextList[0];
                 score = findBestMovesDFS(newGameState, newMinoIndex, newNextList, depth + 1, maxDepth)[0].score + attackScore + AIfactors.holdPenalty;
                 
+            } else {
+                score = evaluate(newGameState) + attackScore + AIfactors.holdPenalty;
+                ai_nodes_evaluated++;
             }
+
+            
 
             
 

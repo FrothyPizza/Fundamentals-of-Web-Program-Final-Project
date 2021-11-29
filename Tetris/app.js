@@ -247,6 +247,7 @@ document.addEventListener('keydown', e => {
 
 window.setInterval(() => {
 
+
     if(fullScreen) {
         canvas.width = document.documentElement.clientWidth;
         canvas.height = document.documentElement.clientHeight;
@@ -268,22 +269,10 @@ window.setInterval(() => {
     }
 
     // Draw the game centered on screen
-    blockSize = Math.round(canvas.height / (HEIGHT-YMARGIN + 4));
+    blockSize = Math.round(Math.min(canvas.height / (HEIGHT-YMARGIN + 5), canvas.width / (WIDTH+10)));
     let xOffset = (canvas.width - WIDTH * blockSize) / 2;
     let yOffset = (canvas.height - (HEIGHT - YMARGIN) * blockSize) / 2;
     playerTetrisGame.render(context, {x: xOffset, y: yOffset}, blockSize, blockSize);
-
-
-    //Make it so that if the pause menu is too tall, it's moved down so that the top of the pause menu is at the top of the screen
-    //and that there is a scroll bar
-    if(pauseContents.clientHeight > document.documentElement.clientHeight) {
-        pauseContents.style.top = document.documentElement.clientHeight/1.8 + 'px';
-
-
-
-    } else {
-        pauseContents.style.top = '50%';
-    }
 
 
 }, 1000/60);

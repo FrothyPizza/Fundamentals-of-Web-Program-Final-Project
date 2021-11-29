@@ -2,18 +2,21 @@
 
 
 function pushOntoNextlist(nextList) {
-    var bag = [0, 1, 2, 3, 4, 5, 6];
+
+
+
+    let bag = [0, 1, 2, 3, 4, 5, 6];
     
     // shuffle the bag
-    for (var i = bag.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = bag[i];
+    for (let i = bag.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        let temp = bag[i];
         bag[i] = bag[j];
         bag[j] = temp;
     }
 
     // Add the bag to the next list
-    for (var i = 0; i < bag.length; i++) {
+    for (let i = 0; i < bag.length; i++) {
         nextList.push(bag[i]);
     }
 
@@ -69,7 +72,7 @@ class PlayerTetrisGame {
         this.gameState = new TetrisGameState();
         this.nextList = [];
 
-        for(var i = 0; i < 14; i++) {
+        for(var i = 0; i < 3; i++) {
             pushOntoNextlist(this.nextList);
         }
 
@@ -101,7 +104,6 @@ class PlayerTetrisGame {
         this.piecesPlaced = 0;
 
         this.aiWorker = new Worker("javascript/ai-worker.js");
-
         this.updateBestMoves();
 
     }
