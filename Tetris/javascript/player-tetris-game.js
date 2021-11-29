@@ -100,7 +100,7 @@ class PlayerTetrisGame {
 
         this.piecesPlaced = 0;
 
-        this.ai_worker = new Worker("javascript/ai-worker.js");
+        this.aiWorker = new Worker("javascript/ai-worker.js");
 
         this.updateBestMoves();
 
@@ -111,8 +111,8 @@ class PlayerTetrisGame {
         //this.sortedAIMoves = findBestMovesDFS(this.gameState, this.curMino.mino, this.nextList, 0, 1);
 
         this.sortedAIMoves = null;
-        this.ai_worker.postMessage({ args : [this.gameState, this.curMino.mino, this.nextList] });
-        this.ai_worker.onmessage = (e) => {
+        this.aiWorker.postMessage({ args : [this.gameState, this.curMino.mino, this.nextList] });
+        this.aiWorker.onmessage = (e) => {
             this.sortedAIMoves = e.data;
         }
     }
@@ -132,6 +132,8 @@ class PlayerTetrisGame {
         this.Rclock.restart();
         this.RARRClock.restart();
         this.SDFClock.restart();
+
+        this.updateBestMoves();
     }
 
 
@@ -287,9 +289,11 @@ class PlayerTetrisGame {
             if(this.sortedAIMoves != null) {
                 let move = this.sortedAIMoves[0];
                 fullyPerformMove(this.gameState, this.curMino, move.moves, this.nextList);
-                this.curMino.setTetromino(this.nextList[0]);
-                this.nextList.splice(0, 1);
-                if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
+                if(move.moves.includes(MOVE_HD)) {
+                    this.curMino.setTetromino(this.nextList[0]);
+                    this.nextList.splice(0, 1);
+                    if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
+                }
                 this.updateBestMoves();
             }
         }

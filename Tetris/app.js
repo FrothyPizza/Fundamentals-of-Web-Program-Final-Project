@@ -29,10 +29,8 @@ let playerTetrisGame = new PlayerTetrisGame();
 
 
 restartButton.onclick = function() {
-    if(confirm("Would you really like to restart? This will erase your progress.")) {
-        completlyRestart();
-        pause();
-    }
+    playerTetrisGame.restart();
+    pause();
 }
 
 resumeButton.onclick = function() {

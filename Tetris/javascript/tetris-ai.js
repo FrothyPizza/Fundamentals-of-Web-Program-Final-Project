@@ -1,14 +1,14 @@
 
-let AIfactor = {
-    hole: -100,                       // how bad holes are
-    holeCovered: -30,                 // how many blocks are above a hole (bad)
+let AIfactors = {
+    hole: -160,                       // how bad holes are
+    holeCovered: -50,                 // how many blocks are above a hole (bad)
 
-    heightVariance: -12,              // average height differance between adjacent columns
+    heightVariance: -20,              // average height differance between adjacent columns
     averageHeight: -7,                // average height
     averageHeightSQ: -0.2,            // average height squared
     highestHeight: -2,                // highest height
     
-    upstackThreshold: 6,              // how high it wants to stack before stacking higher is bad
+    upstackThreshold: 8,              // how high it wants to stack before stacking higher is bad
     averageHeightBelowUpstack: 100,   // how much higher it wants to stack
 
     downstackThreshold: 14,           // how high the matrix must be before it heavily favors downstacking
@@ -21,19 +21,20 @@ let AIfactor = {
     surfaceParity: -4,                // https://harddrop.com/wiki/Parity
 
     blocksInTenthColumn: 0,        // how many blocks are in the tenth column (used for stacking for tetrises)
-    tetrisReady: 200,                 // it is good if it's tetris ready      
+    tetrisReady: 0,                 // it is good if it's tetris ready      
 
 
     holdPenalty: -30,         
 
     attack: 0, 
     attackEffeciency: 0,
-    clearWithoutAttack: 0,
-    clearedDoubleOrTriple: 0,
+    clearWithoutAttack: -30,
+    clearedDoubleOrTriple: -30,
     tSpinSetup: 0,
     performedTSpin: 0,
     clearedTetris: 500,
 };
+
 
 
 
@@ -122,7 +123,7 @@ const O_MOVES = [
     [MOVE_L, MOVE_HD],
     [MOVE_L, MOVE_L, MOVE_HD],
     [MOVE_L, MOVE_HD],
-    [, MOVE_HD],
+    [MOVE_HD],
     [MOVE_RR, MOVE_HD],
     [MOVE_RR, MOVE_L, MOVE_HD],
     [MOVE_R, MOVE_R, MOVE_HD],
@@ -216,12 +217,26 @@ class EndPosition {
     equals(other) {
         return this.x == other.x && this.y == other.y && this.rot == other.rot;
     }
+
+    static fromMino(mino) {
+        return new EndPosition(mino.x, mino.y, mino.rot);
+    }
 }
 
 
 
 const AI_ACTIONS = [MOVE_L, MOVE_LL, MOVE_R, MOVE_RR, ROT_CW, ROT_CCW, MOVE_DD];
+
+
 function pathfindToEndPosition(gameState, minoIndex, endPosition) {
+
+    
+
+
+    
+    
+
+
 
 
 }
@@ -335,16 +350,17 @@ function evaluate(gameState) {
                     }
                 }
                 // blocks above a hole
-                // only up to 5
-                for (let c = 0; c < 5; ++c) {
+                for (let c = 0; c < HEIGHT-j; ++c) {
                     if (gameState.matrix[i + (j - c) * WIDTH] >= 0)
                         ++coverdHoleCount;
+                    else
+                        break;
                 }
             }
         }
     }
-    score += holeCount * AIfactor.hole;
-    score += coverdHoleCount * AIfactor.holeCovered;
+    score += holeCount * AIfactors.hole;
+    score += coverdHoleCount * AIfactors.holeCovered;
 
 
     // create an array containing column heights
@@ -371,15 +387,15 @@ function evaluate(gameState) {
         if (columnHeights[i] > highestHeight) highestHeight = columnHeights[i];
     }
     averageHeight /= columnHeights.length;
-    score += averageHeight * AIfactor.averageHeight;
-    score += averageHeight * averageHeight * AIfactor.averageHeightSQ;
-    score += highestHeight * AIfactor.highestHeight;
+    score += averageHeight * AIfactors.averageHeight;
+    score += averageHeight * averageHeight * AIfactors.averageHeightSQ;
+    score += highestHeight * AIfactors.highestHeight;
 
-    if(averageHeight > AIfactor.downstackThreshold)
-        score += AIfactor.averageHeightAboveThreshold * averageHeight;
+    if(averageHeight > AIfactors.downstackThreshold)
+        score += AIfactors.averageHeightAboveThreshold * averageHeight;
 
-    if(averageHeight < AIfactor.upstackThreshold)
-        score += AIfactor.averageHeightBelowUpstack * averageHeight;
+    if(averageHeight < AIfactors.upstackThreshold)
+        score += AIfactors.averageHeightBelowUpstack * averageHeight;
 
 
     // Calculate I dependencies and height variance
@@ -407,9 +423,9 @@ function evaluate(gameState) {
         if (leftHeight - thisHeight >= 3 && rightHeight - thisHeight >= 3) Idependencies++;
         if (leftHeight - thisHeight >= 6 && rightHeight - thisHeight >= 6) deepIdependencies++;
     }
-    score += Idependencies * AIfactor.Idependency;
-    score += deepIdependencies * AIfactor.deepIdependency;
-    score += variance * AIfactor.heightVariance;
+    score += Idependencies * AIfactors.Idependency;
+    score += deepIdependencies * AIfactors.deepIdependency;
+    score += variance * AIfactors.heightVariance;
 
 
     // Calculate parity
@@ -421,14 +437,14 @@ function evaluate(gameState) {
     }
     parity /= 2;
     parity = Math.abs(parity);
-    score += parity * AIfactor.surfaceParity;
+    score += parity * AIfactors.surfaceParity;
 
     // Blocks in tenth column
     let tenthColumnBlocks = 0;
     for(let i = 0; i < HEIGHT; ++i) {
         if (gameState.matrix[WIDTH-1 + i * WIDTH] >= 0) tenthColumnBlocks++;
     }
-    score += tenthColumnBlocks * AIfactor.blocksInTenthColumn;
+    score += tenthColumnBlocks * AIfactors.blocksInTenthColumn;
 
 
     // Check to see if it's tetris ready
@@ -440,7 +456,7 @@ function evaluate(gameState) {
             break;
         }
     }
-    score += tetrisReady * AIfactor.tetrisReady;
+    score += tetrisReady * AIfactors.tetrisReady;
 
 
 
@@ -456,7 +472,7 @@ function evaluate(gameState) {
     //     ['A', '#', '#', '#', 'A'],
     //     ['1', '1', '#', '1', '1']
     // ];
-    // score += shapePercentCompletion(gameState, Tshape, holePositions) * AIfactor.tSpinSetup;
+    // score += shapePercentCompletion(gameState, Tshape, holePositions) * AIfactors.tSpinSetup;
 
 
     return score;
@@ -466,26 +482,26 @@ function evaluateAttackScore(attack, clear, tSpin) {
     let score = 0;
 
     // total attack sent
-    score += attack * attack * AIfactor.attack; // attack squared to encourage larger clears
+    score += attack * attack * AIfactors.attack; // attack squared to encourage larger clears
 
-    if (clear == 2 || clear == 3) score += AIfactor.clearedDoubleOrTriple;
+    if (clear == 2 || clear == 3) score += AIfactors.clearedDoubleOrTriple;
 
-    if (clear == 4) score += AIfactor.clearedTetris;
+    if (clear == 4) score += AIfactors.clearedTetris;
 
     // clear without attack
     if (clear > 0 && attack == 0) {
-        score += clear * AIfactor.clearWithoutAttack;
+        score += clear * AIfactors.clearWithoutAttack;
     }
 
     // attack efficiency
     if (clear > 0 && attack > 0) {
-        score += attack / clear * AIfactor.attackEffeciency;
+        score += attack / clear * AIfactors.attackEffeciency;
     }
 
     if (tSpin == TSPIN)
-        score += clear * AIfactor.performedTSpin + AIfactor.tSpinSetup; // since this destroys a setup, increase its value by the amount lost
+        score += clear * AIfactors.performedTSpin + AIfactors.tSpinSetup; // since this destroys a setup, increase its value by the amount lost
     else if (tSpin == TSPIN_MINI)
-        score += clear * AIfactor.performedTSpin / 3;
+        score += clear * AIfactors.performedTSpin / 3;
 
     return score;
 }
@@ -499,7 +515,6 @@ function evaluateAttackScore(attack, clear, tSpin) {
 
 
 
-//****** Trying out different methods of calculating the best move ******//
 
 
 
@@ -552,7 +567,7 @@ function findBestMoves(gameState, mino, nextList) {
             let attackScore = evaluateAttackScore(attack, clear, tSpin);
             let moveScore = evaluate(newGameState);
 
-            let score = attackScore + moveScore + AIfactor.holdPenalty;
+            let score = attackScore + moveScore + AIfactors.holdPenalty;
 
             bestMoves.push({
                 moves: [HOLD],
@@ -579,6 +594,9 @@ function findBestMoves(gameState, mino, nextList) {
 
     return bestMoves;
 }
+
+
+
 
 
 function findBestMovesDFS(gameState, mino, nextList, depth, maxDepth) {
@@ -619,45 +637,44 @@ function findBestMovesDFS(gameState, mino, nextList, depth, maxDepth) {
     }
 
 
-    let bestMovesWithHold = [];
-    // if(gameState.canHold) {
-    //     let holdNext = nextList.slice();
-    //     let holdState = gameState.clone();
-    //     let holdMino = new Tetromino(mino);
-    //     holdState.performHold(holdMino, holdNext);
+    if(gameState.canHold) {
 
-    //     let allMovesWithHold = getMoves(holdMino.mino);
-    //     for (let i = 0; i < allMovesWithHold.length; ++i) {
-    //         let newMino = new Tetromino(holdMino);
-    //         let newGameState = holdState.clone();
-    //         let move = allMovesWithHold[i].slice();
+        let holdNext = nextList.slice();
+        let holdState = gameState.clone();
+        let holdMino = new Tetromino(mino);
+        holdState.performHold(holdMino, holdNext);
 
-    //         fullyPerformMove(newGameState, newMino, move, nextList);
-    //         let clear = newGameState.lastClear;
-    //         let attack = newGameState.lastAttack;
-    //         let tSpin = newGameState.lastTSpin;
+        let allMovesWithHold = getMoves(holdMino.mino);
+        for (let i = 0; i < allMovesWithHold.length; ++i) {
+            let newMino = new Tetromino(holdMino);
+            let newGameState = holdState.clone();
+            let move = allMovesWithHold[i].slice();
+
+            fullyPerformMove(newGameState, newMino, move, nextList);
+            let clear = newGameState.lastClear;
+            let attack = newGameState.lastAttack;
+            let tSpin = newGameState.lastTSpin;
             
-    //         let attackScore = evaluateAttackScore(attack, clear, tSpin);
-    //         let moveScore = evaluate(newGameState);
+            let attackScore = evaluateAttackScore(attack, clear, tSpin);
+            let moveScore = evaluate(newGameState);
 
-    //         let score = attackScore + moveScore + AIfactor.holdPenalty;
-    //         if(depth < maxDepth) {
-    //             let newNextList = nextList.slice();
-    //             newNextList.shift();
-    //             let newMinoIndex = nextList[0];
-    //             score = findBestMovesDFS(newGameState, newMinoIndex, newNextList, depth + 1, maxDepth)[0].score;// + AIfactor.holdPenalty;
+            let score = attackScore + moveScore + AIfactors.holdPenalty;
+            if(depth < maxDepth) {
+                let newNextList = nextList.slice();
+                newNextList.shift();
+                let newMinoIndex = nextList[0];
+                score = findBestMovesDFS(newGameState, newMinoIndex, newNextList, depth + 1, maxDepth)[0].score + attackScore + AIfactors.holdPenalty;
                 
-    //         }
+            }
 
             
 
-    //         bestMovesWithHold.push({
-    //             moves: [HOLD],
-    //             score: score
-    //         });
-    //     }
-    // }
-
+            bestMoves.push({
+                moves: [HOLD],
+                score: score
+            });
+        }
+    }
 
 
 
@@ -671,6 +688,7 @@ function findBestMovesDFS(gameState, mino, nextList, depth, maxDepth) {
     for (let i = 0; i < bestMoves.length; ++i) {
         if (bestMoves[i].moves[0] == HOLD) holdIndecies.push(i);
     }
+    
     for (let i = holdIndecies.length - 1; i >= 1; --i) {
         bestMoves.splice(holdIndecies[i], 1);
     }

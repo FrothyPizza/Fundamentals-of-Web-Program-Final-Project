@@ -4,26 +4,24 @@ if(typeof window === 'undefined') {
     self.importScripts('../javascript/constants.js');
     self.importScripts('../javascript/tetris-ai.js');
 
-    let move = [];
 
-    self.addEventListener("message", function(e) {
+
+
+    self.onmessage = function(e) {
         let args = e.data.args;
 
-
-        args[0].__proto__ = TetrisGameState.prototype;
-        
 
         let gameState = args[0];
         let curMino = args[1];
         let nextList = args[2];
 
+        gameState.__proto__ = TetrisGameState.prototype;
 
-        this.postMessage(getAIMove(gameState, curMino, nextList));
+        self.postMessage(findBestMovesDFS(gameState, curMino, nextList, 0, 1));
+        // self.postMessage(findBestMoves(gameState, curMino, nextList));
 
-    }, false);
-
-    function getAIMove(gameState, curMino, nextList) {
-        return findBestMovesDFS(gameState, curMino, nextList, 0, 2);
+        
 
     }
+
 }
