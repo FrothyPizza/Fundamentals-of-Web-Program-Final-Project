@@ -40,6 +40,24 @@ class Tetromino {
             this.data[i] = new Point(tetrominoData[minoIndex][i].x, tetrominoData[minoIndex][i].y);
         }
     }
+
+    equals(other) {
+        if (this.mino != other.mino) {
+            return false;
+        }
+
+        for (let i = 0; i < 4; ++i) {
+            if (this.data[i].x != other.data[i].x || this.data[i].y != other.data[i].y) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    clone() {
+        return new Tetromino(this);
+    }
 }
 
 

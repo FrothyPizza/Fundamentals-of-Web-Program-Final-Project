@@ -206,39 +206,29 @@ function fullyPerformMove(gameState, mino, moves, nextList) {
 
 
 
-class EndPosition {
-    constructor(x, y, rot) {
-        this.x = x;
-        this.y = y;
-        this.rot = rot;
-    }
-
-    equals(other) {
-        return this.x == other.x && this.y == other.y && this.rot == other.rot;
-    }
-
-    static fromMino(mino) {
-        return new EndPosition(mino.x, mino.y, mino.rot);
-    }
-}
 
 
 
 const AI_ACTIONS = [MOVE_L, MOVE_LL, MOVE_R, MOVE_RR, ROT_CW, ROT_CCW, MOVE_DD];
 
 
-function pathfindToEndPosition(gameState, minoIndex, endPosition) {
+function pathfindToEndMino(gameState, startMino, endMino, path, depth, maxDepth) {
 
-    
+    let mino = startMino.clone();
 
+    for(let i = 0; i < AI_ACTIONS.length; ++i) {
+        let action = AI_ACTIONS[i];
+        executeMove(gameState, mino, [action], 0, []);
 
-    
-    
+        
 
+    }
 
-
+    return null;
 
 }
+
+
 
 
 
@@ -266,7 +256,7 @@ function findAllHoles(gameState) {
 }
 
 function findAllUniqueMoves(gameState, minoIndex) {
-    let endPositions = [];
+    let endMinos = [];
     let holes = findAllHoles(gameState);
 
     let possibleRotations = 4;
@@ -290,7 +280,7 @@ function findAllUniqueMoves(gameState, minoIndex) {
                 if (gameState.softDrop(mino)) continue;
 
                 if (!gameState.matrixContains(mino)) {
-                    endPositions.push({ x: mino.x, y: mino.y, rot: i });
+                    endMinos.push(mino);
                     break;
                 }
             }
@@ -298,7 +288,22 @@ function findAllUniqueMoves(gameState, minoIndex) {
 
     }
 
-    return endPositions;
+    // Remove duplicates
+    let uniqueEndMinos = [];
+    for (let mino of endMinos) {
+        let found = false;
+        for (let uniqueMino of uniqueEndMinos) {
+            if (mino.equals(uniqueMino)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            uniqueEndMinos.push(mino);
+    }
+
+
+    return uniqueEndMinos;
 }
 
 
@@ -311,15 +316,43 @@ function findAllUniqueMoves(gameState, minoIndex) {
 
 
 
-function getMoves(mino) {
-    if (mino == MINO_S || mino == MINO_Z)
-        return SZ_MOVES;
-    else if (mino == MINO_O)
-        return O_MOVES;
-    else if (mino == MINO_L || mino == MINO_J || mino == MINO_T)
-        return LJT_MOVES;
-    else if (mino == MINO_I)
-        return I_MOVES;
+function getMoves(mino, gameState=null) {
+
+
+    // if (mino == MINO_S || mino == MINO_Z)
+    //     return SZ_MOVES;
+    // else if (mino == MINO_O)
+    //     return O_MOVES;
+    // else if (mino == MINO_L || mino == MINO_J || mino == MINO_T)
+    //     return LJT_MOVES;
+    // else if (mino == MINO_I)
+    //     return I_MOVES;
+    let moves = [];
+
+    if(mino == MINO_S || mino == MINO_Z) {
+        moves = SZ_MOVES.slice();
+    } else if(mino == MINO_O) {
+        moves = O_MOVES.slice();
+    } else if(mino == MINO_L || mino == MINO_J || mino == MINO_T) {
+        moves = LJT_MOVES.slice();
+    } else if(mino == MINO_I) {
+        moves = I_MOVES.slice();
+    }
+
+    if(gameState != null) {
+        let uniqueMoves = findAllUniqueMoves(gameState, mino);
+        for(let i = 0; i < uniqueMoves.length; ++i) {
+            let path = pathfindToEndMino(gameState, mino, uniqueMoves[i], 0, 3);
+            if(path != null) {
+                moves.push(path);
+            }
+        }
+    }
+
+
+
+
+    return moves;
 }
 
 

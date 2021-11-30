@@ -243,7 +243,6 @@ class PlayerTetrisGame {
     inputGeneral(keyCode) {
         // hard drop
         if (keyCode == CONTROLS.HARD_DROP) {
-            //console.log(findAllUniqueMoves(this.gameState, this.curMino));
 
             this.gameState.hardDrop(this.curMino);
             this.curMino.setTetromino(this.nextList[0]);
@@ -277,6 +276,16 @@ class PlayerTetrisGame {
 
             let attack = this.gameState.lastAttack;
             
+
+            let uniqueMoves = findAllUniqueMoves(this.gameState, this.curMino.mino);
+            let moves = [];
+            for(let i = 0; i < uniqueMoves.length; ++i) {
+                let path = pathfindToEndMino(this.gameState, this.curMino, uniqueMoves[i], [], 0, 6);
+                if(path != null) {
+                    moves.push(path);
+                }
+            }
+            console.log(moves);
 
 
 
