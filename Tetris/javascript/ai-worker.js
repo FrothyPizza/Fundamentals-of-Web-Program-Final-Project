@@ -19,7 +19,7 @@ if(typeof window === 'undefined') {
 
         ai_nodes_evaluated = 0;
         self.postMessage(findBestMovesDFS(gameState, curMino, nextList, 0, 1));
-        console.log('ai_nodes_evaluated: ' + ai_nodes_evaluated);
+        //console.log('ai_nodes_evaluated: ' + ai_nodes_evaluated);
         // self.postMessage(findBestMoves(gameState, curMino, nextList));
 
         

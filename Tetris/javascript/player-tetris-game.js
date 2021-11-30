@@ -110,12 +110,26 @@ class PlayerTetrisGame {
 
     updateBestMoves() {
         //this.sortedAIMoves = findBestMoves(this.gameState, this.curMino.mino, this.nextList);
-        //this.sortedAIMoves = findBestMovesDFS(this.gameState, this.curMino.mino, this.nextList, 0, 1);
+        //this.sortedAIMoves = findBestMovesDFS(this.gameState, this.curMino.mino, this.nextList, 0, 0); return;
 
         this.sortedAIMoves = null;
         this.aiWorker.postMessage({ args : [this.gameState, this.curMino.mino, this.nextList] });
         this.aiWorker.onmessage = (e) => {
             this.sortedAIMoves = e.data;
+        }
+    }
+
+    performAIMove() {
+        if(this.sortedAIMoves != null) {
+            let move = this.sortedAIMoves[0];
+            fullyPerformMove(this.gameState, this.curMino, move.moves, this.nextList);
+            this.piecesPlaced++;
+            if(move.moves.includes(MOVE_HD)) {
+                this.curMino.setTetromino(this.nextList[0]);
+                this.nextList.splice(0, 1);
+                if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
+            }
+            this.updateBestMoves();
         }
     }
 
@@ -288,16 +302,7 @@ class PlayerTetrisGame {
 
 
         if (keyCode == 80) {
-            if(this.sortedAIMoves != null) {
-                let move = this.sortedAIMoves[0];
-                fullyPerformMove(this.gameState, this.curMino, move.moves, this.nextList);
-                if(move.moves.includes(MOVE_HD)) {
-                    this.curMino.setTetromino(this.nextList[0]);
-                    this.nextList.splice(0, 1);
-                    if (this.nextList.length < 14) pushOntoNextlist(this.nextList);
-                }
-                this.updateBestMoves();
-            }
+            this.performAIMove();
         }
 
 

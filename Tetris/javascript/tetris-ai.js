@@ -8,7 +8,7 @@ let AIfactors = {
     averageHeightSQ: -0.2,            // average height squared
     highestHeight: -2,                // highest height
     
-    upstackThreshold: 8,              // how high it wants to stack before stacking higher is bad
+    upstackThreshold: 10,              // how high it wants to stack before stacking higher is bad
     averageHeightBelowUpstack: 100,   // how much higher it wants to stack
 
     downstackThreshold: 14,           // how high the matrix must be before it heavily favors downstacking
@@ -20,8 +20,8 @@ let AIfactors = {
     partialIdependency: -20,          // number of columns with 2 adjacent columns >=2 higher than this one
     surfaceParity: -4,                // https://harddrop.com/wiki/Parity
 
-    blocksInTenthColumn: 0,        // how many blocks are in the tenth column (used for stacking for tetrises)
-    tetrisReady: 0,                 // it is good if it's tetris ready      
+    blocksInTenthColumn: -2,        // how many blocks are in the tenth column (used for stacking for tetrises)
+    tetrisReady: 50,                 // it is good if it's tetris ready      
 
 
     holdPenalty: -30,         
