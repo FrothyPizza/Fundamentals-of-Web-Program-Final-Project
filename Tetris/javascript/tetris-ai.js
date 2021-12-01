@@ -4,11 +4,11 @@ let AIfactors = {
     holeCovered: -50,                 // how many blocks are above a hole (bad)
 
     heightVariance: -20,              // average height differance between adjacent columns
-    averageHeight: -7,                // average height
-    averageHeightSQ: -0.2,            // average height squared
+    averageHeight: -4,                // average height
+    averageHeightSQ: -0.1,            // average height squared
     highestHeight: -2,                // highest height
     
-    upstackThreshold: 10,              // how high it wants to stack before stacking higher is bad
+    upstackThreshold: 6,              // how high it wants to stack before stacking higher is bad
     averageHeightBelowUpstack: 100,   // how much higher it wants to stack
 
     downstackThreshold: 14,           // how high the matrix must be before it heavily favors downstacking
@@ -214,17 +214,6 @@ const AI_ACTIONS = [MOVE_L, MOVE_LL, MOVE_R, MOVE_RR, ROT_CW, ROT_CCW, MOVE_DD];
 
 function pathfindToEndMino(gameState, startMino, endMino, path, depth, maxDepth) {
 
-    let mino = startMino.clone();
-
-    for(let i = 0; i < AI_ACTIONS.length; ++i) {
-        let action = AI_ACTIONS[i];
-        executeMove(gameState, mino, [action], 0, []);
-
-        
-
-    }
-
-    return null;
 
 }
 
@@ -339,15 +328,15 @@ function getMoves(mino, gameState=null) {
         moves = I_MOVES.slice();
     }
 
-    if(gameState != null) {
-        let uniqueMoves = findAllUniqueMoves(gameState, mino);
-        for(let i = 0; i < uniqueMoves.length; ++i) {
-            let path = pathfindToEndMino(gameState, mino, uniqueMoves[i], 0, 3);
-            if(path != null) {
-                moves.push(path);
-            }
-        }
-    }
+    // if(gameState != null) {
+    //     let uniqueMoves = findAllUniqueMoves(gameState, mino);
+    //     for(let i = 0; i < uniqueMoves.length; ++i) {
+    //         let path = pathfindToEndMino(gameState, mino, uniqueMoves[i], 0, 3);
+    //         if(path != null) {
+    //             moves.push(path);
+    //         }
+    //     }
+    // }
 
 
 

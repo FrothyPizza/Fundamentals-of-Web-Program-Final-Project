@@ -280,7 +280,9 @@ class PlayerTetrisGame {
             let uniqueMoves = findAllUniqueMoves(this.gameState, this.curMino.mino);
             let moves = [];
             for(let i = 0; i < uniqueMoves.length; ++i) {
-                let path = pathfindToEndMino(this.gameState, this.curMino, uniqueMoves[i], [], 0, 6);
+                //let path = pathfindToEndMino(this.gameState, this.curMino, uniqueMoves[i], [], 0, 6);
+                let path = [];
+                pathfindToEndMino(this.gameState, this.curMino, uniqueMoves[i], path, 0, 6);
                 if(path != null) {
                     moves.push(path);
                 }
