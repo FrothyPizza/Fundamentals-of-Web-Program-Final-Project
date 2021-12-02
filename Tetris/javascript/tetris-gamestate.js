@@ -114,6 +114,10 @@ class TetrisGameState {
         return newState;
     }
 
+    get(x, y) {
+        return this.matrix[x + y*WIDTH];
+    }
+
 
 
     // Pass in a tetromino and an array of tetrominoes representing the next list

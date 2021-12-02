@@ -103,6 +103,9 @@ class PlayerTetrisGame {
 
         this.piecesPlaced = 0;
 
+        this.hardDropSound = new Audio("sounds/hard_drop.wav");
+        this.lineClearSound = new Audio("sounds/line_clear.wav");
+
         this.aiWorker = new Worker("javascript/ai-worker.js");
         this.updateBestMoves();
 
@@ -241,7 +244,6 @@ class PlayerTetrisGame {
    
     // this is used for instantaneous inputs
     inputGeneral(keyCode) {
-        // hard drop
         if (keyCode == CONTROLS.HARD_DROP) {
 
             this.gameState.hardDrop(this.curMino);
@@ -256,38 +258,26 @@ class PlayerTetrisGame {
             let clear = this.gameState.lastClear;
             if (clear <= 0) {
                 this.gameState.placeGarbage();
-                let sound = new Audio("sounds/hard_drop.wav");
-                sound.play();
+                this.hardDropSound.play();
             } else {
                 // let pitch = 1.0 + (this.gameState.combo / 16.0);
                 // let sound = new Audio("sounds/line_clear.wav");
                 // sound.playbackRate = pitch;
                 // sound.play();
 
-                let sound = new Audio("sounds/line_clear.wav");
-                sound.play();
+                this.lineClearSound.play();
             }
             
             if(this.gameState.lastTSpin != NO_TSPIN) {
-                let sound = new Audio("sounds/t_spin.wav");
-                sound.play();
+                // let sound = new Audio("sounds/t_spin.wav");
+                // sound.play();
             }
 
 
             let attack = this.gameState.lastAttack;
             
 
-            let uniqueMoves = findAllUniqueMoves(this.gameState, this.curMino.mino);
-            let moves = [];
-            for(let i = 0; i < uniqueMoves.length; ++i) {
-                //let path = pathfindToEndMino(this.gameState, this.curMino, uniqueMoves[i], [], 0, 6);
-                let path = [];
-                pathfindToEndMino(this.gameState, this.curMino, uniqueMoves[i], path, 0, 6);
-                if(path != null) {
-                    moves.push(path);
-                }
-            }
-            console.log(moves);
+
 
 
 

@@ -1,0 +1,31 @@
+* {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* center the canvas vertically and horizontally */
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: rgb(71, 64, 64);
+    height: 100vh;
+}
+
+img {
+    width: 30px;
+    border-radius: 2px;
+    cursor: pointer;
+
+
+
+}
+
+img:hover {
+    filter: opacity(0.9); 
+}
+
+

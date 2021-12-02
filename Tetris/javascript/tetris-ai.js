@@ -209,18 +209,12 @@ function fullyPerformMove(gameState, mino, moves, nextList) {
 
 
 
-const AI_ACTIONS = [MOVE_L, MOVE_LL, MOVE_R, MOVE_RR, ROT_CW, ROT_CCW, MOVE_DD];
 
+function findSoftDropMoves(gameState, minoIndex) {
 
-function pathfindToEndMino(gameState, startMino, endMino, path, depth, maxDepth) {
 
 
 }
-
-
-
-
-
 
 
 
