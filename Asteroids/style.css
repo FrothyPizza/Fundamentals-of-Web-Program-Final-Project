@@ -5,7 +5,6 @@
 }
 
 
-/* center the canvas vertically and horizontally */
 body {
     display: flex;
     align-items: center;

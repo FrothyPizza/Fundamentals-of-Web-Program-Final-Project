@@ -362,7 +362,7 @@ class Game {
     }
 
     addAsteroidFromEdge() {
-        let side = Math.floor(Math.random() * 5);
+        let side = Math.floor(Math.random() * 4);
 
         let type = Math.floor(Math.random() * 3);
 
