@@ -36,7 +36,6 @@ class Asteroid {
         this.points = points;
     }
 
-    // draw a circle with a white stroke
     draw() {
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
@@ -197,41 +196,39 @@ class Bullet {
     }
 }
 
-// const ASTEROID_TYPES = {
-//     SMALL: { radius: 20, speed: 100, points: 5 },
-//     MEDIUM: { radius: 40, speed: 50, points: 10 },
-//     LARGE: { radius: 80, speed: 25, points: 15 }
-// }
+
 
 const ASTEROID_TYPES = [
     { radius: 20, speed: 150, points: 5 },
     { radius: 40, speed: 75, points: 10 },
     { radius: 80, speed: 37.5, points: 15 }
 ];
-const SMALL_ASTEROID = 0;
-const MEDIUM_ASTEROID = 1;
-const LARGE_ASTEROID = 2;
+
 
 
 class Game {
-    constructor() {
-        
+    constructor() {        
         this.restart();
         
+
     }
 
     
     restart() {
         this.SHOTS_PER_SECOND = 4;
+        this.ASTEROIDS_PER_SECOND = 0.5;
+        this.STARTING_ASTEROIDS = 5;
+
         
         this.asteroids = [];
         this.bullets = [];
         this.ship = new Ship(canvas.width/2, canvas.height/2, 20, 300, 100, 0);
-        this.spawnAsteroids();
+        this.spawnAsteroids(this.STARTING_ASTEROIDS);
 
         this.score = 0;
         this.highScore = 0;
         this.shootTimer = this.SHOTS_PER_SECOND;
+        this.asteroidTimer = this.ASTEROIDS_PER_SECOND;
 
         if(localStorage.getItem('highscore') === null) {
             localStorage.setItem('highscore', this.score);
@@ -244,7 +241,7 @@ class Game {
     }
 
 
-    spawnAsteroids(number=10) {
+    spawnAsteroids(number) {
         for (let i = 0; i < number; i++) {
             this.addAsteroidFromEdge();
         }
@@ -254,13 +251,15 @@ class Game {
     draw() {
         this.ship.draw();
 
-        this.asteroids.forEach(asteroid => {
-            asteroid.draw();
-        });
 
-        this.bullets.forEach(bullet => {
+        for(let asteroid of this.asteroids) {
+            asteroid.draw();
+        }
+
+
+        for(let bullet of this.bullets) {
             bullet.draw();
-        });
+        }
 
         context.font = '20px Arial';
         context.fillStyle = 'white';
@@ -277,20 +276,24 @@ class Game {
         this.ship.handleInput(delta);
         this.ship.update(delta);
 
-        this.asteroids.forEach(asteroid => {
+        for(let asteroid of this.asteroids) {
             asteroid.update(delta);
-        });
+        }
 
-        this.bullets.forEach(bullet => {
+        this.asteroidTimer += delta;
+        if (this.asteroidTimer > 1 / this.ASTEROIDS_PER_SECOND) {
+            console.log('spawning asteroid');
+            this.asteroidTimer = 0;
+            this.addAsteroidFromEdge();
+        }
+
+
+        for(let bullet of this.bullets) {
             bullet.update(delta);
             if(bullet.framesAlive > 100) {
                 let index = this.bullets.indexOf(bullet);
                 this.bullets.splice(index, 1);
             }
-        });
-
-        if (this.asteroids.length < 10) {
-            this.spawnAsteroids(5);
         }
 
         this.checkCollisions();
@@ -303,14 +306,15 @@ class Game {
 
 
     checkCollisions() {
-        this.asteroids.forEach(asteroid => {
+        for(let asteroid of this.asteroids) {
             if (circlesColliding({x: this.ship.x, y: this.ship.y, radius: this.ship.size/2}, asteroid)) {
                 this.restart();
             }
-        });
+        }
 
-        this.bullets.forEach(bullet => {
-            this.asteroids.forEach(asteroid => {
+        for(let i = this.bullets.length - 1; i >= 0; i--) {
+            let bullet = this.bullets[i];
+            for(let asteroid of this.asteroids) {
                 if (circlesColliding({x: bullet.x, y: bullet.y, radius: bullet.size/2}, asteroid)) {
                     if(asteroid.radius !== ASTEROID_TYPES[0].radius) {
                         let newType = 0;
@@ -329,8 +333,9 @@ class Game {
                     this.bullets.splice(this.bullets.indexOf(bullet), 1);
                     
                 }
-            });
-        });
+            }
+
+        }
 
     }
 
@@ -427,7 +432,6 @@ function gameLoop(timestamp) {
 
 
 
-    // put the home button on the top right of the canvas
     homeButton.style.position = "absolute";
     canvasPosition = canvas.getBoundingClientRect();
     homeButton.style.top = canvasPosition.top + "px";
