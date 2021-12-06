@@ -282,7 +282,6 @@ class Game {
 
         this.asteroidTimer += delta;
         if (this.asteroidTimer > 1 / this.ASTEROIDS_PER_SECOND) {
-            console.log('spawning asteroid');
             this.asteroidTimer = 0;
             this.addAsteroidFromEdge();
         }
