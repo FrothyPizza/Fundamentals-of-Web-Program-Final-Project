@@ -19,6 +19,9 @@ body {
     opacity: 0;
     pointer-events: none;
 
+    
+    top: -9999px;
+    transition: all 0.2s;
 }
 
 .menuContainer {
@@ -57,7 +60,7 @@ body {
 
     width: 100%;
     
-
+    transition: all 1s ease-in-out;
 }
 
 .menuButton {
@@ -75,7 +78,7 @@ body {
     color: white;
     background-color: black;
     border: 1px solid white;
-    border-radius: 1vh;
+    border-radius: 10px;
 
     margin-top: 1vh;
 
@@ -118,16 +121,13 @@ body {
 
     box-sizing: border-box;
     border: 1px solid white;
-    border-radius: 1vh;
+    border-radius: 10px;
 
-    padding: 1vh;
+    padding: 0.5em;
 
     margin-top: 1vh;
 
     width: 100%;
-
-    
-
 
 }
 
@@ -135,10 +135,10 @@ body {
     color: white;
     background-color: black;
     border: 1px solid white;
-    border-radius: 1vh;
+    border-radius: 10px;
 
-    margin-left: 1vh;
-    margin-right: 1vh;
+    margin-left: 0.5em;
+    margin-right: 0.2em;
 
     text-align: center;
 
@@ -156,9 +156,11 @@ input::-webkit-inner-spin-button {
 
 .sliderText {
     color: white;
-    margin-left: 1vh;
-    margin-right: 1vh;
+    margin-left: 0.3em;
+    margin-right: 0.3em;
 
+    width: 100%;
+    font-size: 0.9em;
 }
 
 .slider {
@@ -178,7 +180,7 @@ input::-webkit-inner-spin-button {
     height: 1.2em;
 
     background: white;
-    border-radius: 1vh;
+    border-radius: 10px;
 
     cursor: pointer;
 }
