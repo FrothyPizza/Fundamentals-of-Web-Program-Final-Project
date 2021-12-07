@@ -7,7 +7,6 @@ body {
     background-color: black;
     font-family: sans-serif;
 
-    
 
     font-size: 20px;
     
@@ -19,6 +18,7 @@ body {
     position: absolute;
     opacity: 0;
     pointer-events: none;
+
 }
 
 .menuContainer {
@@ -42,6 +42,11 @@ body {
 ::-webkit-scrollbar-thumb {
     background: white;
     border-radius: 9999px;
+}
+
+/* set the color of the entire scroll bar to dark gray */
+::-webkit-scrollbar-track {
+    background: #333;
 }
 
 
@@ -81,9 +86,102 @@ body {
 .menuButton:hover {
     background-color: white;
     color: black;
+
+    /* make it slightly hover up and down */
+    animation-name: hover;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes hover {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.2vh);
+    }
+    100% {
+        transform: translateY(0);
+    }
 }
 
 .menuButton:active {
     background-color: #ccc;
     color: #444;
 }
+
+.sliderContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+    border: 1px solid white;
+    border-radius: 1vh;
+
+    padding: 1vh;
+
+    margin-top: 1vh;
+
+    width: 100%;
+
+    
+
+
+}
+
+.sliderValue {
+    color: white;
+    background-color: black;
+    border: 1px solid white;
+    border-radius: 1vh;
+
+    margin-left: 1vh;
+    margin-right: 1vh;
+
+    text-align: center;
+
+
+    width: 3em;
+    font-size: 1em;
+}
+
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.sliderText {
+    color: white;
+    margin-left: 1vh;
+    margin-right: 1vh;
+
+}
+
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 100%;
+    background: black;
+    border: 1px solid white;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+
+    width: 2em;
+    height: 1.2em;
+
+    background: white;
+    border-radius: 1vh;
+
+    cursor: pointer;
+}
+
+
+

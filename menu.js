@@ -26,6 +26,42 @@ class MenuPage {
         this.container.appendChild(button);
     }
 
+    addSliderValue(name, number, min, max, step, callback) {
+        let sliderContainer = document.createElement("div");
+        sliderContainer.classList.add("sliderContainer");
+
+        let text = document.createElement("div");
+        text.classList.add("sliderText");
+        text.innerHTML = name;
+        sliderContainer.appendChild(text);
+
+        let slider = document.createElement("input");
+        slider.classList.add("slider");
+        slider.type = "range";
+        slider.min = min;
+        slider.max = max;
+        slider.step = step;
+        slider.value = number;
+        sliderContainer.appendChild(slider);
+
+        let value = document.createElement("input");
+        value.type = "number";
+        value.value = number;
+        value.classList.add("sliderValue");
+        sliderContainer.appendChild(value);
+        this.container.appendChild(sliderContainer);
+
+        value.oninput = () => {
+            slider.value = value.value;
+            callback(slider.value);
+        };
+        slider.oninput = () => {
+            value.value = slider.value;
+            callback(slider.value);
+        };
+
+    }
+
     show(previousPage) {
         this.container.classList.remove("hidden");
         this.previousPage = previousPage;
@@ -67,6 +103,10 @@ class Menu {
         });
         this.pages.main.addButton("Settings", () => {
             this.setCurrentPage(this.pages.settings);
+        });
+
+        this.pages.settings.addSliderValue("Volume", 10, 0, 100, 1, (e) => {
+
         });
 
 
