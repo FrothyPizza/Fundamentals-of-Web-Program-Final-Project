@@ -49,6 +49,7 @@ class MenuPage {
         slider.max = max;
         slider.step = step;
         slider.value = number;
+        slider.defaultValue = number;
         sliderContainer.appendChild(slider);
 
         let value = document.createElement("input");
@@ -62,12 +63,35 @@ class MenuPage {
             slider.value = value.value;
             callback(slider.value);
         };
+        value.onblur = () => {
+            if(value.value < min) {
+                value.value = min;
+            }
+            if(value.value > max) {
+                value.value = max;
+            }
+            if(value.value == "") {
+                value.value = number;
+            }
+            slider.value = value.value;
+            value.oninput();
+        };
+
         slider.oninput = () => {
             value.value = slider.value;
             callback(slider.value);
         };
 
     }
+
+    addParagraph(text) {
+        let paragraph = document.createElement("p");
+        paragraph.classList.add("menuParagraph");
+        paragraph.innerHTML = text;
+        this.container.appendChild(paragraph);
+    }
+
+
 
     show() {
         this.container.classList.remove("hidden");
@@ -84,7 +108,15 @@ class MenuPage {
 
     hide() {
         this.container.classList.add("hidden");
-        console.log("Hiding " + this.name + " page");
+        // console.log("Hiding " + this.name + " page");
+    }
+
+    getValue(name) {
+        let value = this.container.querySelector("#" + name);
+        if(value == null) {
+            return null;
+        }
+        return value.value;
     }
 
 }
@@ -110,15 +142,17 @@ class Menu {
 		this.pages.colors.setBackButtonPage(this.pages.settings);
 		this.pages.about.setBackButtonPage(this.pages.main);
 
-        this.pages.main.addButton("Settings", () => {
-            this.setCurrentPage(this.pages.settings);
-        });
         this.pages.main.addButton("Select Game", () => {
             this.setCurrentPage(this.pages.gameSelect);
+        });
+        this.pages.main.addButton("Settings", () => {
+            this.setCurrentPage(this.pages.settings);
         });
         this.pages.main.addButton("About", () => {
             this.setCurrentPage(this.pages.about);
         });
+
+        this.pages.about.addParagraph("Go away.");
 
 
 
@@ -167,10 +201,16 @@ class Menu {
         this.pages.settings.addButton("Load Settings", () => {
             this.loadValues();
         });
+        this.pages.settings.addButton("Reset Settings", () => {
+            this.resetValues();
+            
+        });
 
 
 
-        this.pages.colors.addSliderValue("Red", 255, 0, 255, 1, (e) => {
+
+
+        this.pages.colors.addSliderValue("Red", 255, 1, 255, 1, (e) => {
             this.container.querySelectorAll("*").forEach(element => {
                 let rgb = element.style.color;
                 rgb = rgb.substring(4, rgb.length - 1);
@@ -180,7 +220,7 @@ class Menu {
             });
         });
 
-        this.pages.colors.addSliderValue("Green", 255, 0, 255, 1, (e) => {
+        this.pages.colors.addSliderValue("Green", 255, 1, 255, 1, (e) => {
             this.container.querySelectorAll("*").forEach(element => {
                 let rgb = element.style.color;
                 rgb = rgb.substring(4, rgb.length - 1);
@@ -190,7 +230,7 @@ class Menu {
             });
         });
 
-        this.pages.colors.addSliderValue("Blue", 255, 0, 255, 1, (e) => {
+        this.pages.colors.addSliderValue("Blue", 255, 1, 255, 1, (e) => {
             this.container.querySelectorAll("*").forEach(element => {
                 let rgb = element.style.color;
                 rgb = rgb.substring(4, rgb.length - 1);
@@ -216,7 +256,6 @@ class Menu {
         });
 
 
-
         this.container.querySelectorAll("*").forEach(element => {
             if(element.classList.contains("sliderValue")) {
                 element.oninput();
@@ -232,7 +271,7 @@ class Menu {
 
 
     setCurrentPage(page) {
-        console.log("Setting current page to " + page.name + " from " + this.currentPage.name);
+        // console.log("Setting current page to " + page.name + " from " + this.currentPage.name);
         this.currentPage.hide();
         page.show(this.currentPage);
         this.currentPage = page;
@@ -245,7 +284,7 @@ class Menu {
                 values[element.parentElement.id] = element.value;
             }
         });
-        console.log(values);
+        // console.log(values);
         localStorage.setItem("settings", JSON.stringify(values));
     }
 
@@ -257,6 +296,15 @@ class Menu {
         this.container.querySelectorAll("*").forEach(element => {
             if(element.classList.contains("sliderValue")) {
                 element.value = values[element.parentElement.id];
+                element.oninput();
+            }
+        });
+    }
+
+    resetValues() {
+        this.container.querySelectorAll("*").forEach(element => {
+            if(element.classList.contains("slider")) {
+                element.value = element.defaultValue;
                 element.oninput();
             }
         });
