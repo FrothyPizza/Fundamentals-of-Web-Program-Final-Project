@@ -1,5 +1,5 @@
-
-class MenuPage {
+ 
+class MenuPage { 
     constructor(name, parentMenu, isRoot) {
         this.parentMenu = parentMenu;
 
@@ -18,6 +18,10 @@ class MenuPage {
             this.previousPage = null;
         }
     }
+
+	setBackButtonPage(page) {
+		this.backButtonPage = page;
+	}
 
     addButton(buttonName, callback) {
         let button = document.createElement("button");
@@ -65,14 +69,13 @@ class MenuPage {
 
     }
 
-    show(previousPage) {
+    show() {
         this.container.classList.remove("hidden");
-        this.previousPage = previousPage;
 
         for (let i = 0; i < this.buttons.length; i++) {
             if(this.buttons[i].innerHTML == "Back") {
                 this.buttons[i].onclick = () => {
-                    this.parentMenu.setCurrentPage(this.previousPage);
+                    this.parentMenu.setCurrentPage(this.backButtonPage);
                 }
             }
         }
@@ -101,6 +104,11 @@ class Menu {
             colors: new MenuPage("colorsMenu", this),
             about: new MenuPage("aboutMenu", this),
         };
+
+		this.pages.settings.setBackButtonPage(this.pages.main);
+		this.pages.gameSelect.setBackButtonPage(this.pages.main);
+		this.pages.colors.setBackButtonPage(this.pages.settings);
+		this.pages.about.setBackButtonPage(this.pages.main);
 
         this.pages.main.addButton("Settings", () => {
             this.setCurrentPage(this.pages.settings);
