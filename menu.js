@@ -186,7 +186,7 @@ class Menu {
                 element.style.borderWidth = e + "px";
             });
         });
-        this.pages.settings.addSliderValue("Hover Speed", 0.75, 0, 2, 0.01, (e) => {
+        this.pages.settings.addSliderValue("Hover Speed", 0.5, 0, 2, 0.01, (e) => {
             this.container.querySelectorAll("button").forEach(element => {
                 element.style.animationDuration = 2.01-e + "s";
                 if(e == 0) {
