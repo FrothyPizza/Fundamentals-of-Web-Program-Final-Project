@@ -45,6 +45,50 @@ function rect(x, y, w, h){
     context.fillRect(x - view.x, y - view.y, w, h);   
 }
 
+class Clock {
+    constructor() {
+        this.startTime = 0;
+        this.elapsedTime = 0;
+        this.pausedTime = 0;
+        this.isPaused = false;
+        this.isStarted = false;
+    }
+
+    start() {
+        this.startTime = Date.now();
+        this.isStarted = true;
+        this.isPaused = false;
+    }
+
+    pause() {
+        if (this.isStarted && !this.isPaused) {
+            this.isPaused = true;
+            this.pausedTime = Date.now();
+        }
+    }
+
+    resume() {
+        if (this.isStarted && this.isPaused) {
+            this.isPaused = false;
+            this.startTime += (Date.now() - this.pausedTime);
+        }
+    }
+
+    getElapsedTime() {
+        if (this.isStarted && !this.isPaused) {
+            this.elapsedTime = Date.now() - this.startTime;
+        }
+        return this.elapsedTime;
+    }
+
+    restart() {
+        this.startTime = Date.now();
+        this.elapsedTime = 0;
+        this.isStarted = true;
+        this.isPaused = false;
+    }
+}
+
 const BLOCK_SIZE = 40;
 const COLLISION_MARGIN = 7;
 
@@ -65,8 +109,10 @@ let BLOCKS = {
     notThere: 'N', // a false block
     win: 'W'
 }
-let flashingBlockTimer = 0;
-let FRAMES_PER_FLASH = 60;
+//let FRAMES_PER_FLASH = 60;
+let SECONDS_PER_FLASH = 1;
+let flashingBlockTimer = new Clock();
+flashingBlockTimer.start();
 
 // map converter is here 
 // https://replit.com/@HaroldSeamans/Hals-Tower-Map-Format-Converter#Main.java
@@ -409,8 +455,6 @@ function completlyRestart() {
     player.y = player.spawnY;
     
     player.hasWon = false;
-
-
 } 
 
 
@@ -622,16 +666,7 @@ function renderMap() {
     for(let y = 0; y < map.length; ++y) {
         for(let x = 0; x < map[y].length; ++x) {
             
-            if(flashingBlockTimer % FRAMES_PER_FLASH == 0) {
-                
-                if(map[y][x] == BLOCKS.flashing)
-                    map[y] = map[y].replaceAt(x, BLOCKS.flashingOff);
-                else if(map[y][x] == BLOCKS.flashingOff)
-                    map[y] = map[y].replaceAt(x, BLOCKS.flashing);
-                flashingBlockTimer = 0;
-            }
-            
-
+        
             let blockX = x * BLOCK_SIZE;
             let blockY = y * BLOCK_SIZE;         
             
@@ -687,11 +722,25 @@ function renderMap() {
             }
         }
     }
+
+
 }
 
            
 function handleCollisions() {
-    ++flashingBlockTimer;
+    for(let y = 0; y < map.length; ++y) {
+        for(let x = 0; x < map[y].length; ++x) {
+            if(flashingBlockTimer.getElapsedTime()/1000 > SECONDS_PER_FLASH) {                
+                if(map[y][x] == BLOCKS.flashing)
+                    map[y] = map[y].replaceAt(x, BLOCKS.flashingOff);
+                else if(map[y][x] == BLOCKS.flashingOff)
+                    map[y] = map[y].replaceAt(x, BLOCKS.flashing);
+            }
+        }
+    }
+    if(flashingBlockTimer.getElapsedTime()/1000 > SECONDS_PER_FLASH) {  
+        flashingBlockTimer.restart();
+    }
 
     for(let y = 0; y < map.length; ++y) {
         for(let x = 0; x < map[y].length; ++x) {
@@ -788,19 +837,24 @@ function handleCollisions() {
 }
 
 
-function updatePlayerPhysics() {
-    player.yVel += playerConstants.grav;
+function updatePlayerPhysics(delta) {
+    player.yVel += playerConstants.grav * delta/16.66;
     
     if(player.yVel > COLLISION_MARGIN) player.yVel = COLLISION_MARGIN;
     //if(player.yVel < -COLLISION_MARGIN) player.yVel = -COLLISION_MARGIN;
     //if(player.xVel > COLLISION_MARGIN) player.xVel = COLLISION_MARGIN;
     //if(player.xVel < -COLLISION_MARGIN) player.xVel = -COLLISION_MARGIN;
 
-    player.y += player.yVel;
-    player.x += player.xVel;
-    
-    player.xVel *= 0.9;
+    player.y += player.yVel * delta/16.66;
+    player.x += player.xVel * delta/16.66;
 
+
+    
+
+    let friction = 0.0067;
+    let modifiedFriction = 1 / (1 + (delta * friction));
+
+    player.xVel *= modifiedFriction;
 }
 
 
@@ -825,7 +879,8 @@ function updateView(){
     width = canvas.width;
     height = canvas.height;
 
-    viewSmoothness = 0.1;
+    viewSmoothness = 0.005 * delta;
+
     view.x = lerp(view.x, player.x - width/2, viewSmoothness);
     view.y = lerp(view.y, player.y - height/2, viewSmoothness);
     
@@ -918,10 +973,87 @@ function pause() {
     }
 }
 
+
+
+
 view.x = player.x - canvas.width/2 - playerConstants.width/2;
 view.y = player.y - canvas.height/2 - playerConstants.height/2;
-window.setInterval(() => {
+// window.setInterval(() => {
     
+//     if(fullScreen) {
+//         canvas.width = document.documentElement.clientWidth;
+//         canvas.height = document.documentElement.clientHeight;
+//     }
+
+//     if(keys[ESC]) {
+//         pause();
+//         keys[ESC] = false;
+//     }
+
+
+//     fill(171, 163, 201);
+//     context.clearRect(0, 0, canvas.width, canvas.height);
+//     context.fillRect(0, 0, canvas.width, canvas.height);
+    
+
+//     renderMap();
+
+//     renderPlayer();
+
+
+//     if(!paused) {
+//         handleCollisions();
+//         updatePlayerPhysics();
+
+//         if(devtools && keys[32]){
+//             player.spawnX = player.x;
+//             player.spawnY = player.y;
+//         }
+
+
+//         if(keys[RIGHT]) player.xVel += 0.3;
+//         if(keys[LEFT]) player.xVel -= 0.3;
+
+//         updateView();
+
+//     }
+
+
+
+
+
+    
+//     fill(255, 0, 0);
+//     context.font = "20px Arial";
+//     context.fillText("Deaths: " + player.deaths, 50, 50);
+//     context.fillText("Time: " + secondsElapsed().toFixed(2), 50, 70);
+    
+    
+//     if(player.hasWon) {
+//         fill(255, 255, 0);
+//         context.font = "200px Arial";
+//         context.fillText("YOU WIN", 100, 200);
+//     }
+// }, 1000/60);
+
+
+
+
+
+
+
+let lastTime = 0;
+let delta = 0;
+function gameLoop(timeStep) {
+    window.requestAnimationFrame(gameLoop);
+
+    delta = timeStep - lastTime;
+    lastTime = timeStep;
+
+    if(delta > 100) {
+        delta = 100;
+    }
+
     if(fullScreen) {
         canvas.width = document.documentElement.clientWidth;
         canvas.height = document.documentElement.clientHeight;
@@ -936,7 +1068,7 @@ window.setInterval(() => {
     fill(171, 163, 201);
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillRect(0, 0, canvas.width, canvas.height);
-    
+
 
     renderMap();
 
@@ -945,7 +1077,7 @@ window.setInterval(() => {
 
     if(!paused) {
         handleCollisions();
-        updatePlayerPhysics();
+        updatePlayerPhysics(delta);
 
         if(devtools && keys[32]){
             player.spawnX = player.x;
@@ -953,8 +1085,8 @@ window.setInterval(() => {
         }
 
 
-        if(keys[RIGHT]) player.xVel += 0.3;
-        if(keys[LEFT]) player.xVel -= 0.3;
+        if(keys[RIGHT]) player.xVel += 0.3 * delta/16.66;
+        if(keys[LEFT]) player.xVel -= 0.3 * delta/16.66;
 
         updateView();
 
@@ -962,9 +1094,6 @@ window.setInterval(() => {
 
 
 
-
-
-    
     fill(255, 0, 0);
     context.font = "20px Arial";
     context.fillText("Deaths: " + player.deaths, 50, 50);
@@ -976,15 +1105,5 @@ window.setInterval(() => {
         context.font = "200px Arial";
         context.fillText("YOU WIN", 100, 200);
     }
-}, 1000/60);
-
-
-
-
-
-
-
-
-
-
-
+}
+gameLoop(0);
