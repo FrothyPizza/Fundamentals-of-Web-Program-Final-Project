@@ -1,6 +1,4 @@
-
-
-let keys = [];
+var keys = [];
 
 document.addEventListener('keydown', event => {
     keys[event.keyCode] = true;
@@ -24,14 +22,14 @@ String.prototype.replaceAt = function(index, replacement) {
 }
 
 
-let canvas = document.getElementById('canvas');
+var canvas = document.getElementById('canvas');
 
 canvas.width = 600;
 canvas.height = 600;
-let fullScreen = true;
-let context = canvas.getContext('2d');
+var fullScreen = true;
+var context = canvas.getContext('2d');
 
-let view = {
+var view = {
     x: 0,
     y: 0
 };
@@ -41,52 +39,9 @@ function fill(r, g, b){
 }
 
 function rect(x, y, w, h){
+    // use this commented line intead of the one below to prevent some block blurring when rendering, but it makes it feel more... clunky, I guess
     //context.fillRect(Math.round(x - view.x), Math.round(y - view.y), w, h);   
     context.fillRect(x - view.x, y - view.y, w, h);   
-}
-
-class Clock {
-    constructor() {
-        this.startTime = 0;
-        this.elapsedTime = 0;
-        this.pausedTime = 0;
-        this.isPaused = false;
-        this.isStarted = false;
-    }
-
-    start() {
-        this.startTime = Date.now();
-        this.isStarted = true;
-        this.isPaused = false;
-    }
-
-    pause() {
-        if (this.isStarted && !this.isPaused) {
-            this.isPaused = true;
-            this.pausedTime = Date.now();
-        }
-    }
-
-    resume() {
-        if (this.isStarted && this.isPaused) {
-            this.isPaused = false;
-            this.startTime += (Date.now() - this.pausedTime);
-        }
-    }
-
-    getElapsedTime() {
-        if (this.isStarted && !this.isPaused) {
-            this.elapsedTime = Date.now() - this.startTime;
-        }
-        return this.elapsedTime;
-    }
-
-    restart() {
-        this.startTime = Date.now();
-        this.elapsedTime = 0;
-        this.isStarted = true;
-        this.isPaused = false;
-    }
 }
 
 const BLOCK_SIZE = 40;
@@ -94,7 +49,7 @@ const COLLISION_MARGIN = 7;
 
 
 
-let BLOCKS = {
+var BLOCKS = {
     ground: 'B',
     invisibleGround: 'I',
     red: 'R',
@@ -109,14 +64,12 @@ let BLOCKS = {
     notThere: 'N', // a false block
     win: 'W'
 }
-//let FRAMES_PER_FLASH = 60;
-let SECONDS_PER_FLASH = 1;
-let flashingBlockTimer = new Clock();
-flashingBlockTimer.start();
+var flashingBlockTimer = 0;
+var FRAMES_PER_FLASH = 60;
 
 // map converter is here 
 // https://replit.com/@HaroldSeamans/Hals-Tower-Map-Format-Converter#Main.java
-let map =  [
+var map =  [
             "BBBB.................",
             "B..B.................",
             "B..B.................",
@@ -399,7 +352,7 @@ const playerConstants = {
     horizontalBounce: 12
 };
 
-let player = {
+var player = {
     x: 0,
     y: 0,
     xVel: 0,
@@ -455,6 +408,8 @@ function completlyRestart() {
     player.y = player.spawnY;
     
     player.hasWon = false;
+
+
 } 
 
 
@@ -494,8 +449,8 @@ function collidingWithBlock(blockX, blockY, collisionProtrusion=0) {
            
 // function renderMapAndHandleCollisions(){
 //     ++flashingBlockTimer;
-//     for(let y = 0; y < map.length; ++y) {
-//         for(let x = 0; x < map[y].length; ++x) {
+//     for(var y = 0; y < map.length; ++y) {
+//         for(var x = 0; x < map[y].length; ++x) {
             
 //             if(flashingBlockTimer % FRAMES_PER_FLASH == 0) {
                 
@@ -625,7 +580,7 @@ function collidingWithBlock(blockX, blockY, collisionProtrusion=0) {
 //             if(map[y][x] == BLOCKS.ground || map[y][x] == BLOCKS.invisibleGround || map[y][x] == BLOCKS.flashing || map[y][x] == BLOCKS.disappearing) {
 //                 if(collidingWithTopOfBlock(blockX, blockY, 0, 2)) {
 //                     // if moving up, then don't allow for a jump
-//                     let shouldntJump = false;
+//                     var shouldntJump = false;
 //                     if(player.yVel < 0) shouldntJump = true;
                     
 //                     player.yVel = 0;
@@ -663,10 +618,19 @@ function collidingWithBlock(blockX, blockY, collisionProtrusion=0) {
 //     }
 // }
 function renderMap() {
-    for(let y = 0; y < map.length; ++y) {
-        for(let x = 0; x < map[y].length; ++x) {
+    for(var y = 0; y < map.length; ++y) {
+        for(var x = 0; x < map[y].length; ++x) {
             
-        
+            if(flashingBlockTimer % FRAMES_PER_FLASH == 0) {
+                
+                if(map[y][x] == BLOCKS.flashing)
+                    map[y] = map[y].replaceAt(x, BLOCKS.flashingOff);
+                else if(map[y][x] == BLOCKS.flashingOff)
+                    map[y] = map[y].replaceAt(x, BLOCKS.flashing);
+                flashingBlockTimer = 0;
+            }
+            
+
             let blockX = x * BLOCK_SIZE;
             let blockY = y * BLOCK_SIZE;         
             
@@ -722,28 +686,14 @@ function renderMap() {
             }
         }
     }
-
-
 }
 
            
 function handleCollisions() {
-    for(let y = 0; y < map.length; ++y) {
-        for(let x = 0; x < map[y].length; ++x) {
-            if(flashingBlockTimer.getElapsedTime()/1000 > SECONDS_PER_FLASH) {                
-                if(map[y][x] == BLOCKS.flashing)
-                    map[y] = map[y].replaceAt(x, BLOCKS.flashingOff);
-                else if(map[y][x] == BLOCKS.flashingOff)
-                    map[y] = map[y].replaceAt(x, BLOCKS.flashing);
-            }
-        }
-    }
-    if(flashingBlockTimer.getElapsedTime()/1000 > SECONDS_PER_FLASH) {  
-        flashingBlockTimer.restart();
-    }
+    ++flashingBlockTimer;
 
-    for(let y = 0; y < map.length; ++y) {
-        for(let x = 0; x < map[y].length; ++x) {
+    for(var y = 0; y < map.length; ++y) {
+        for(var x = 0; x < map[y].length; ++x) {
             let blockX = x * BLOCK_SIZE;
             let blockY = y * BLOCK_SIZE;
             
@@ -837,24 +787,19 @@ function handleCollisions() {
 }
 
 
-function updatePlayerPhysics(delta) {
-    player.yVel += playerConstants.grav * delta/16.66;
+function updatePlayerPhysics() {
+    player.yVel += playerConstants.grav;
     
     if(player.yVel > COLLISION_MARGIN) player.yVel = COLLISION_MARGIN;
     //if(player.yVel < -COLLISION_MARGIN) player.yVel = -COLLISION_MARGIN;
     //if(player.xVel > COLLISION_MARGIN) player.xVel = COLLISION_MARGIN;
     //if(player.xVel < -COLLISION_MARGIN) player.xVel = -COLLISION_MARGIN;
 
-    player.y += player.yVel * delta/16.66;
-    player.x += player.xVel * delta/16.66;
-
-
+    player.y += player.yVel;
+    player.x += player.xVel;
     
+    player.xVel *= 0.9;
 
-    let friction = 0.0067;
-    let modifiedFriction = 1 / (1 + (delta * friction));
-
-    player.xVel *= modifiedFriction;
 }
 
 
@@ -873,14 +818,13 @@ function constrain(a, b, c) {
     return a;
 }
 
-// Make the view smoothly follow the player using a linear interpolation
+// Make the view smoothly follow the player
 function updateView(){
 
     width = canvas.width;
     height = canvas.height;
 
-    viewSmoothness = 0.005 * delta;
-
+    viewSmoothness = 0.1;
     view.x = lerp(view.x, player.x - width/2, viewSmoothness);
     view.y = lerp(view.y, player.y - height/2, viewSmoothness);
     
@@ -889,23 +833,23 @@ function updateView(){
     // view.y = player.y - canvas.height/2 - playerConstants.height/2;
 }
 
-let savedTime = 0;
-let startDate = new Date();
-let startTime = startDate.getTime();
-let pauseTime = 0;
+var savedTime = 0;
+var startDate = new Date();
+var startTime = startDate.getTime();
+var pauseTime = 0;
 function secondsElapsed() {
-    let date = new Date();
-    let time = date.getTime();
-    let difference = time - startTime;
-    let seconds = difference / 1000;
+    var date_now = new Date ();
+    var time_now = date_now.getTime ();
+    var time_diff = time_now - startTime;
+    var seconds_elapsed = time_diff / 1000;
 	
-    player.savedTime = seconds + savedTime;
+    player.savedTime = seconds_elapsed + savedTime;
 
     if(paused) return pauseTime;
-    return seconds + savedTime; 
+    return seconds_elapsed + savedTime; 
 }
 
-let devtools = false;
+var devtools = false;
 
 if(localStorage.getItem('spawnX')) {
     player.spawnX = parseFloat(localStorage.getItem('spawnX'));
@@ -923,9 +867,9 @@ if(localStorage.getItem('spawnX')) {
 resetPlayer();
 
 
-let resumeButton = document.getElementById('resume');
-let restartButton = document.getElementById('restart');
-let creditsButton = document.getElementById('credits');
+var resumeButton = document.getElementById('resume');
+var restartButton = document.getElementById('restart');
+var creditsButton = document.getElementById('credits');
 
 restartButton.onclick = function() {
     if(confirm("Would you really like to restart? This will erase your progress.")) {
@@ -938,6 +882,10 @@ resumeButton.onclick = function() {
     pause();
 }
 
+home.onclick = function() {
+    window.location.href = "../index.html";
+}
+
 creditsButton.onclick = function() {
     if(creditsContents.style.display == 'none') {
         creditsContents.style.display = "block";
@@ -947,13 +895,14 @@ creditsButton.onclick = function() {
 
 }
 
-home.onclick = function() {
-    // Go up a webpage back to the homepage
-    window.location = "../index.html";
-}
 
-
-let paused = false;
+// Make it so that when escape is pressed, the game pauses and displays the pause menu
+// The buttons are resume, restart, and credits
+// When the resume button is pressed, the game resumes
+// When the restart button is pressed, the game restarts
+// When the credits button is pressed, the game displays the credits
+// The credits are displayed in the pause menu
+var paused = false;
 function pause() {
     if(!paused) {
         savedTime = secondsElapsed();
@@ -973,87 +922,10 @@ function pause() {
     }
 }
 
-
-
-
 view.x = player.x - canvas.width/2 - playerConstants.width/2;
 view.y = player.y - canvas.height/2 - playerConstants.height/2;
-// window.setInterval(() => {
+window.setInterval(() => {
     
-//     if(fullScreen) {
-//         canvas.width = document.documentElement.clientWidth;
-//         canvas.height = document.documentElement.clientHeight;
-//     }
-
-//     if(keys[ESC]) {
-//         pause();
-//         keys[ESC] = false;
-//     }
-
-
-//     fill(171, 163, 201);
-//     context.clearRect(0, 0, canvas.width, canvas.height);
-//     context.fillRect(0, 0, canvas.width, canvas.height);
-    
-
-//     renderMap();
-
-//     renderPlayer();
-
-
-//     if(!paused) {
-//         handleCollisions();
-//         updatePlayerPhysics();
-
-//         if(devtools && keys[32]){
-//             player.spawnX = player.x;
-//             player.spawnY = player.y;
-//         }
-
-
-//         if(keys[RIGHT]) player.xVel += 0.3;
-//         if(keys[LEFT]) player.xVel -= 0.3;
-
-//         updateView();
-
-//     }
-
-
- 
-
-
-    
-//     fill(255, 0, 0);
-//     context.font = "20px Arial";
-//     context.fillText("Deaths: " + player.deaths, 50, 50);
-//     context.fillText("Time: " + secondsElapsed().toFixed(2), 50, 70);
-    
-    
-//     if(player.hasWon) {
-//         fill(255, 255, 0);
-//         context.font = "200px Arial";
-//         context.fillText("YOU WIN", 100, 200);
-//     }
-// }, 1000/60);
-
-
-
-
-
-
-
-let lastTime = 0;
-let delta = 0;
-function gameLoop(timeStep) {
-    window.requestAnimationFrame(gameLoop);
-
-    delta = timeStep - lastTime;
-    lastTime = timeStep;
-
-    if(delta > 100) {
-        delta = 100;
-    }
-
     if(fullScreen) {
         canvas.width = document.documentElement.clientWidth;
         canvas.height = document.documentElement.clientHeight;
@@ -1068,7 +940,7 @@ function gameLoop(timeStep) {
     fill(171, 163, 201);
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.fillRect(0, 0, canvas.width, canvas.height);
-
+    
 
     renderMap();
 
@@ -1077,7 +949,7 @@ function gameLoop(timeStep) {
 
     if(!paused) {
         handleCollisions();
-        updatePlayerPhysics(delta);
+        updatePlayerPhysics();
 
         if(devtools && keys[32]){
             player.spawnX = player.x;
@@ -1085,8 +957,27 @@ function gameLoop(timeStep) {
         }
 
 
-        if(keys[RIGHT]) player.xVel += 0.3 * delta/16.66;
-        if(keys[LEFT]) player.xVel -= 0.3 * delta/16.66;
+        
+        // if(keys[82]) {
+        //     alert("The game is restarting. Reload the page to prevent the restart");
+        //     completlyRestart();    
+        //     resetPlayer();
+        //     keys[82] = false;
+        // }
+        
+        /*
+        if(keys[38]) player.y -= 5;
+        if(keys[40]) player.y += 5;
+        if(keys[37]) player.x -= 5;
+        if(keys[39]) player.x += 5;
+        */
+        
+        //if(keys[40]) player.y += 5;
+        
+
+
+        if(keys[RIGHT]) player.xVel += 0.3;
+        if(keys[LEFT]) player.xVel -= 0.3;
 
         updateView();
 
@@ -1094,6 +985,9 @@ function gameLoop(timeStep) {
 
 
 
+
+
+    
     fill(255, 0, 0);
     context.font = "20px Arial";
     context.fillText("Deaths: " + player.deaths, 50, 50);
@@ -1105,5 +999,4 @@ function gameLoop(timeStep) {
         context.font = "200px Arial";
         context.fillText("YOU WIN", 100, 200);
     }
-}
-gameLoop(0);
+}, 1000/60);
