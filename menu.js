@@ -11,7 +11,7 @@ class MenuPage {
         parentMenu.container.appendChild(this.container);
 
         this.name = name;
-        this.buttons = [];
+        this.buttons = []; 
 
         if(!isRoot) {
             this.addButton("Back");

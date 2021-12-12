@@ -1019,7 +1019,7 @@ view.y = player.y - canvas.height/2 - playerConstants.height/2;
 //     }
 
 
-
+ 
 
 
     
