@@ -8,7 +8,7 @@ document.addEventListener('keyup', event => {
     keys[event.keyCode] = false;
 });
 
-
+ 
 const RIGHT = 39;
 const LEFT = 37;
 const UP = 38;
@@ -161,7 +161,7 @@ class Bullet {
         this.speed = speed;
         this.direction = direction;
 
-        this.framesAlive = 0;
+        this.timeAlive = 0;
 
     }
 
@@ -177,7 +177,7 @@ class Bullet {
         this.y += -this.speed * delta * Math.sin(this.direction);
 
         this.wrap();
-        this.framesAlive++;
+        this.timeAlive += delta;
     }
 
     wrap() {
@@ -285,11 +285,16 @@ class Game {
             this.asteroidTimer = 0;
             this.addAsteroidFromEdge();
         }
+		if(this.asteroids.length < 3) {
+			for(let i = 0; i < 3; ++i) {
+				this.spawnAsteroids(3);
+			}
+		}
 
 
         for(let bullet of this.bullets) {
             bullet.update(delta);
-            if(bullet.framesAlive > 100) {
+            if(bullet.timeAlive > 2) {
                 let index = this.bullets.indexOf(bullet);
                 this.bullets.splice(index, 1);
             }
@@ -329,7 +334,7 @@ class Game {
 
                     this.score += asteroid.points;
                     this.asteroids.splice(this.asteroids.indexOf(asteroid), 1);
-                    this.bullets.splice(this.bullets.indexOf(bullet), 1);
+                    this.bullets.splice(i, 1);
                     
                 }
             }
