@@ -10,7 +10,7 @@ document.addEventListener('keyup', event => {
 
 
 
-
+ 
 const RIGHT = 39;
 const LEFT = 37;
 const UP = 38;
